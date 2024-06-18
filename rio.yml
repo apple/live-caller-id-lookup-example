@@ -1,0 +1,61 @@
+# Copyright 2024 Apple Inc. and the Swift Homomorphic Encryption project authors
+#
+# This file is part of the Swift Homomorphic Encryption project, located at:
+#   https://github.com/apple/swift-homomorphic-encryption
+#
+# This file is subject to the License in the LICENSE.txt file (located at the
+# top level of this project). If you did not receive a copy of the License
+# with this file, please refer to the project's LICENSE in the project's
+# repository, located at the URL above.
+
+schemaVersion: 2.0
+machine:
+  # https://sdp.apple.com/docs/base-images/container-images/builder-images
+  baseImage: docker.apple.com/base-images/ubi9/swiftnightly-6.0-builder
+notify:
+  pullRequestComment:
+    postOnSuccess: false
+    postOnFailure: false
+pipelines:
+- group: test
+  branchRules:
+    includePatterns:
+    - main
+  build:
+    template: freestyle:v4:prb
+    steps:
+      - ci/install-jemalloc.sh
+      - swift test --configuration release --parallel
+      - cd Examples/pir-service
+      # rio clones repo in `workspace` folder
+      - perl -i -pe 's/package:\ \"swift-he\"/package:\ \"workspace\"/g' Package.swift
+      - cat Package.swift
+      - swift test --configuration release --parallel
+      - cd -
+- group: pre-commit
+  branchRules:
+    includePatterns:
+    - main
+  build:
+    template: freestyle:v4:prb
+    steps:
+      - pip install pre-commit
+      # CI will commit to `main`
+      # swiftformat & swiftlint tested separately
+      - SKIP=no-commit-to-branch,swiftformat,swiftlint pre-commit run --all-files
+- group: lint
+  branchRules:
+    includePatterns:
+    - main
+  build:
+    template: freestyle:v4:prb
+    steps:
+      - ci/run-swiftlint.sh
+- group: format
+  branchRules:
+    includePatterns:
+    - main
+  build:
+    template: freestyle:v4:prb
+    steps:
+      - ci/run-swiftformat.sh

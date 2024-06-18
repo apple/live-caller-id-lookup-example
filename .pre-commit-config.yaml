@@ -1,0 +1,64 @@
+# Copyright 2024 Apple Inc. and the Swift Homomorphic Encryption project authors
+#
+# This file is part of the Swift Homomorphic Encryption project, located at:
+#   https://github.com/apple/swift-homomorphic-encryption
+#
+# This file is subject to the License in the LICENSE.txt file (located at the
+# top level of this project). If you did not receive a copy of the License
+# with this file, please refer to the project's LICENSE in the project's
+# repository, located at the URL above.
+
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+    -   id: check-case-conflict
+    -   id: check-merge-conflict
+    -   id: check-symlinks
+    -   id: fix-byte-order-marker
+    -   id: check-toml
+    -   id: check-yaml
+        args: [--allow-multiple-documents]
+    -   id: end-of-file-fixer
+    -   id: mixed-line-ending
+    -   id: no-commit-to-branch
+        args: [--branch, main]
+    -   id: trailing-whitespace
+-   repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.5.5
+    hooks:
+    -   id: insert-license
+        name: insert-license
+        'types_or': [c, swift, proto]
+        args:
+           - --license-filepath
+           - copyright-header.txt
+           - --comment-style
+           - //
+           - --allow-past-years
+           - --use-current-year
+           - --detect-license-in-X-top-lines=10
+    -   id: insert-license
+        name: insert-license-yaml
+        'types_or': [yaml]
+        args:
+           - --license-filepath
+           - copyright-header.txt
+           - --allow-past-years
+           - --use-current-year
+-   repo: local
+    hooks:
+    # Note, this is https://github.com/nicklockwood/SwiftFormat, not
+    # https://github.com/apple/swift-format
+    -   id: swiftformat
+        name: swiftformat
+        entry: swiftformat
+        language: system
+        types: [swift]
+    # https://github.com/realm/SwiftLint
+    -   id: swiftlint
+        name: swiftlint
+        entry: swiftlint lint --strict
+        language: system
+        exclude: DoubleWidthInt.swift|.pb.swift
+        types: [swift]

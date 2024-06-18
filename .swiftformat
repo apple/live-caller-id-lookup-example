@@ -1,0 +1,11 @@
+--closingparen same-line
+--exclude **/*.pb.swift
+--ifdef no-indent
+--indent 4
+--indentstrings true
+--maxwidth 120
+--nospaceoperators ..<, ...
+--ranges no-space
+--self init-only
+--swiftversion 5.8
+--asynccapturing XCTAssertAsyncThrowsError
