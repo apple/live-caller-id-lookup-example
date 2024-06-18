@@ -22,8 +22,6 @@ let package = Package(
     platforms: [.macOS(.v14)],
     products: [
         .executable(name: "PIRService", targets: ["PIRService"]),
-        .executable(name: "PIRProcessDatabase", targets: ["PIRProcessDatabase"]),
-        .executable(name: "PIRGenerateDatabase", targets: ["PIRGenerateDatabase"]),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.2.0"),
@@ -44,37 +42,6 @@ let package = Package(
                 // TODO: need to replace "swift-he" with "swift-homomorphic-encryption"
                 // when moving to proper package url
                 .product(name: "HomomorphicEncryptionProtobuf", package: "swift-he"),
-                .product(name: "PrivateInformationRetrievalProtobuf", package: "swift-he"),
-            ],
-            swiftSettings: swiftSettings),
-        .executableTarget(
-            name: "PIRProcessDatabase",
-            dependencies: [
-                .product(name: "ArgumentParser", package: "swift-argument-parser"),
-                // TODO: need to replace "swift-he" with "swift-homomorphic-encryption"
-                // when moving to proper package url
-                .product(name: "HomomorphicEncryptionProtobuf", package: "swift-he"),
-                .product(name: "PrivateInformationRetrievalProtobuf", package: "swift-he"),
-                .product(name: "HomomorphicEncryption", package: "swift-he"),
-            ],
-            swiftSettings: swiftSettings),
-        .executableTarget(
-            name: "PIRShardDatabase",
-            dependencies: [
-                .product(name: "ArgumentParser", package: "swift-argument-parser"),
-                // TODO: need to replace "swift-he" with "swift-homomorphic-encryption"
-                // when moving to proper package url
-                .product(name: "HomomorphicEncryption", package: "swift-he"),
-                .product(name: "PrivateInformationRetrievalProtobuf", package: "swift-he"),
-            ],
-            swiftSettings: swiftSettings),
-        .executableTarget(
-            name: "PIRGenerateDatabase",
-            dependencies: [
-                .product(name: "ArgumentParser", package: "swift-argument-parser"),
-                // TODO: need to replace "swift-he" with "swift-homomorphic-encryption"
-                // when moving to proper package url
-                .product(name: "HomomorphicEncryption", package: "swift-he"),
                 .product(name: "PrivateInformationRetrievalProtobuf", package: "swift-he"),
             ],
             swiftSettings: swiftSettings),
