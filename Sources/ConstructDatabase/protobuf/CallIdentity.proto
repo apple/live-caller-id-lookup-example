@@ -1,0 +1,57 @@
+// Copyright 2024 Apple Inc. and the Swift Homomorphic Encryption project authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+// Image format.
+enum ImageFormat {
+  // Unspecified format.
+  IMAGE_FORMAT_UNSPECIFIED = 0;
+  // High Efficiency Image File Format (HEIF / HEIC).
+  IMAGE_FORMAT_HEIC = 1;
+}
+
+// Identity Category.
+//
+// The system might show identity information differently based on the category.
+enum IdentityCategory {
+  // Unspecified category.
+  IDENTITY_CATEGORY_UNSPECIFIED = 0;
+  // Person category.
+  IDENTITY_CATEGORY_PERSON = 1;
+  // Business category.
+  IDENTITY_CATEGORY_BUSINESS = 2;
+}
+
+// Icon
+message Icon {
+  // Image format for the icon
+  ImageFormat format = 1;
+  // Encoded image in the specified format.
+  bytes image = 2;
+}
+
+// Caller Identity
+message CallIdentity {
+  // Identity information.
+  string name = 1;
+  // Icon to be displayed with the identity.
+  Icon icon = 2;
+  // Cache expiry minutes.
+  //
+  // The system will reuse this response for this many minutes before requesting it again.
+  uint32 cache_expiry_minutes = 3;
+  // Identity category.
+  IdentityCategory category = 4;
+}
