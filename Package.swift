@@ -30,8 +30,8 @@ let package = Package(
         .package(url: "https://github.com/hummingbird-project/hummingbird", from: "2.0.0-beta.2"),
         .package(url: "https://github.pie.apple.com/si-beaumont/swift-crypto", revision: "3.4.0+rsabssa.alpha.1"),
         .package(url: "https://github.com/apple/swift-asn1.git", .upToNextMajor(from: "1.0.0")),
-        // TODO: need to switch to a repository URL
-        .package(path: "../../"),
+        // TODO: need to switch to a repository URL & a version number
+        .package(url: "git@github.pie.apple.com:SIMLCryptoAndPrivacy/swift-he.git", branch: "main"),
     ],
     targets: [
         .executableTarget(

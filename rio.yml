@@ -24,14 +24,7 @@ pipelines:
   build:
     template: freestyle:v4:prb
     steps:
-      - ci/install-jemalloc.sh
       - swift test --configuration release --parallel
-      - cd Examples/pir-service
-      # rio clones repo in `workspace` folder
-      - perl -i -pe 's/package:\ \"swift-he\"/package:\ \"workspace\"/g' Package.swift
-      - cat Package.swift
-      - swift test --configuration release --parallel
-      - cd -
 - group: pre-commit
   branchRules:
     includePatterns:
