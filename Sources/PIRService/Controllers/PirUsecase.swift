@@ -10,7 +10,7 @@
 
 import HomomorphicEncryption
 import HomomorphicEncryptionProtobuf
-import HummingbirdCore
+import Hummingbird
 import PrivateInformationRetrieval
 import PrivateInformationRetrievalProtobuf
 

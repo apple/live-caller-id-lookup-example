@@ -24,7 +24,7 @@ struct UserIdentifier: Equatable, Hashable {
     }
 }
 
-protocol IdentifiedRequestContext: BaseRequestContext {
+protocol IdentifiedRequestContext: RequestContext {
     var userIdentifier: UserIdentifier { get set }
 }
 

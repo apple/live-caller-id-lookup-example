@@ -27,8 +27,10 @@ class PIRServiceControllerTests: XCTestCase {
         let app = try await buildApplication()
         try await app.test(.live) { client in
             try await client.execute(uri: "/key", method: .post) { response in
-                XCTAssertEqual(response.status, .badRequest)
-                XCTAssertEqual(String(buffer: response.body), "Missing 'User-Identifier' header")
+                let expectedErrror = HTTPError(.badRequest, message: "Missing 'User-Identifier' header")
+                XCTAssertEqual(response.status, expectedErrror.status)
+                let expectedBody = expectedErrror.body(allocator: ByteBufferAllocator())
+                XCTAssertEqual(response.body, expectedBody)
             }
         }
     }

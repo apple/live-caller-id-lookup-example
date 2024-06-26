@@ -17,12 +17,12 @@ import NIO
 import PrivateInformationRetrieval
 
 struct AppContext: IdentifiedRequestContext, AuthenticatedRequestContext, RequestContext {
-    var coreContext: Hummingbird.CoreRequestContext
+    var coreContext: CoreRequestContextStorage
     var userIdentifier: UserIdentifier
     var userTier: UserTier
 
-    init(channel: any NIOCore.Channel, logger: Logging.Logger) {
-        self.coreContext = .init(allocator: channel.allocator, logger: logger)
+    init(source: ApplicationRequestContextSource) {
+        self.coreContext = .init(source: source)
         self.userIdentifier = UserIdentifier(identifier: "")
         self.userTier = .tier1
     }
@@ -60,7 +60,7 @@ func buildApplication(
     evaluationKeyStore: some PersistDriver = MemoryPersistDriver()) async throws -> some ApplicationProtocol
 {
     let router = Router(context: AppContext.self)
-    router.middlewares.add(LogRequestsMiddleware(.info, includeHeaders: false))
+    router.middlewares.add(LogRequestsMiddleware(.info, includeHeaders: .none))
 
     let pirServiceController = PIRServiceController(usecases: usecaseStore, evaluationKeyStore: evaluationKeyStore)
     let pirGroup = router.group()

@@ -29,7 +29,7 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.2.0"),
         .package(url: "https://github.com/apple/swift-asn1.git", .upToNextMajor(from: "1.0.0")),
         .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.0.0"),
-        .package(url: "https://github.com/hummingbird-project/hummingbird", from: "2.0.0-beta.2"),
+        .package(url: "https://github.com/hummingbird-project/hummingbird", exact: "2.0.0-beta.8"),
         .package(url: "https://github.pie.apple.com/si-beaumont/swift-crypto", revision: "3.4.0+rsabssa.alpha.1"),
     ],
     targets: [

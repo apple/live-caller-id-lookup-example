@@ -17,7 +17,7 @@ enum UserTier: Equatable, CaseIterable, Hashable, Codable {
     case tier3
 }
 
-protocol AuthenticatedRequestContext: BaseRequestContext {
+protocol AuthenticatedRequestContext: RequestContext {
     var userTier: UserTier { get set }
 }
 
