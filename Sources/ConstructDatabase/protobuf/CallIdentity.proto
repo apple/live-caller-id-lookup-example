@@ -1,0 +1,38 @@
+// Copyright 2024 Apple Inc. and the Swift Homomorphic Encryption project authors
+//
+// This file is part of the Swift Homomorphic Encryption project, located at:
+//   https://github.com/apple/swift-homomorphic-encryption
+//
+// This file is subject to the License in the LICENSE.txt file (located at the
+// top level of this project). If you did not receive a copy of the License
+// with this file, please refer to the project's LICENSE in the project's
+// repository, located at the URL above.
+
+syntax = "proto3";
+
+enum ImageFormat {
+    IMAGE_FORMAT_UNSPECIFIED = 0;
+    IMAGE_FORMAT_HEIC = 1;
+}
+
+enum IdentityCategory {
+    IDENTITY_CATEGORY_UNSPECIFIED = 0;
+    IDENTITY_CATEGORY_PERSON = 1;
+    IDENTITY_CATEGORY_BUSINESS = 2;
+}
+
+message Icon {
+    ImageFormat format = 1;
+    bytes image = 2;
+}
+
+message CallIdentity {
+    // identity information
+    string name = 1;
+    // icon
+    Icon icon = 2;
+    // how many minutes to keep this entry in the cache
+    uint32 cache_expiry_minutes = 3;
+    // identity category
+    IdentityCategory category = 4;
+}

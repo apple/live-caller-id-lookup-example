@@ -22,6 +22,7 @@ let package = Package(
     platforms: [.macOS(.v14)],
     products: [
         .executable(name: "PIRService", targets: ["PIRService"]),
+        .executable(name: "ConstructDatabase", targets: ["ConstructDatabase"]),
     ],
     dependencies: [
         // TODO: need to switch to a repository URL & a version number
@@ -31,6 +32,7 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.0.0"),
         .package(url: "https://github.com/hummingbird-project/hummingbird", exact: "2.0.0-beta.8"),
         .package(url: "https://github.pie.apple.com/si-beaumont/swift-crypto", revision: "3.4.0+rsabssa.alpha.1"),
+        .package(url: "https://github.com/apple/swift-protobuf.git", from: "1.6.0"),
     ],
     targets: [
         .executableTarget(
@@ -55,4 +57,13 @@ let package = Package(
             ],
             exclude: ["TestVectors/PrivacyPassPublicTokens.json"],
             swiftSettings: swiftSettings),
+        .executableTarget(
+            name: "ConstructDatabase",
+            dependencies: [
+                .product(name: "ArgumentParser", package: "swift-argument-parser"),
+                // TODO: need to replace "swift-he" with "swift-homomorphic-encryption"
+                // when moving to proper package url
+                .product(name: "PrivateInformationRetrievalProtobuf", package: "swift-he"),
+                .product(name: "SwiftProtobuf", package: "swift-protobuf"),
+            ]),
     ])

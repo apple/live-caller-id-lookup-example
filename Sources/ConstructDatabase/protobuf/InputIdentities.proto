@@ -1,0 +1,27 @@
+// Copyright 2024 Apple Inc. and the Swift Homomorphic Encryption project authors
+//
+// This file is part of the Swift Homomorphic Encryption project, located at:
+//   https://github.com/apple/swift-homomorphic-encryption
+//
+// This file is subject to the License in the LICENSE.txt file (located at the
+// top level of this project). If you did not receive a copy of the License
+// with this file, please refer to the project's LICENSE in the project's
+// repository, located at the URL above.
+
+syntax = "proto3";
+
+import "CallIdentity.proto";
+
+message InputCallIdentity {
+    // identity information
+    string name = 1;
+    // how many minutes to keep this entry in the cache
+    uint32 cache_expiry_minutes = 2;
+    // should we block it
+    bool block = 3;
+    IdentityCategory category = 4;
+}
+
+message InputIdentities {
+    map<string, InputCallIdentity> identities = 1;
+}

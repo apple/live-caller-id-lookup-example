@@ -60,5 +60,5 @@ repos:
         name: swiftlint
         entry: swiftlint lint --strict
         language: system
-        exclude: DoubleWidthInt.swift|.pb.swift
+        exclude: .pb.swift
         types: [swift]
