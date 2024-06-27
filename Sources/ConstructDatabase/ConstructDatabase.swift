@@ -25,6 +25,7 @@ let discussion =
 @main
 struct ConstructDatabase: ParsableCommand {
     static let configuration: CommandConfiguration = .init(
+        commandName: "ConstructDatabase",
         abstract: "Transforms some input data into two datasets",
         discussion: discussion)
     static var exampleIdentities: String {

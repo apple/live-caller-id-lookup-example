@@ -26,6 +26,9 @@ struct ServerConfiguration: Codable {
 
 @main
 struct ServerCommand: AsyncParsableCommand {
+    static let configuration: CommandConfiguration = .init(
+        commandName: "PIRService")
+
     @Option var hostname: String = "127.0.0.1"
     @Option var port: Int = 8080
     @Option var configFile: String?
