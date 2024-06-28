@@ -10,7 +10,7 @@
 
 import Foundation
 
-extension [UInt8] {
+public extension [UInt8] {
     init?(base64URLEncoded string: String) {
         let base64Encoded = string
             .replacingOccurrences(of: "-", with: "+")

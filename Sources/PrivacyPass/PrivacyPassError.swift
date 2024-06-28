@@ -8,9 +8,13 @@
 // with this file, please refer to the project's LICENSE in the project's
 // repository, located at the URL above.
 
-enum PrivacyPass {
-    static let TokenTypeBlindRSA: UInt16 = 2
-    static let TokenTypeBlindRSAKeySizeInBits: Int = 2048
-    static let TokenTypeBlindRSANK: Int = 256
-    static let TokenTypeBlindRSASaltLength: Int = 48
+public enum PrivacyPassError: Error, Equatable, Sendable {
+    case invalidKeySize
+    case invalidSPKIFormat
+    case invalidTokenKeyId
+    case invalidTokenRequestBlindedMessageSize
+    case invalidTokenRequestSize
+    case invalidTokenResponseSize
+    case invalidTokenSize
+    case invalidTokenType
 }

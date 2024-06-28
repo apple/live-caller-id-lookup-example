@@ -9,29 +9,30 @@
 // repository, located at the URL above.
 
 import Hummingbird
+import PrivacyPass
 
-extension PrivacyPass.PrivacyPassError: HTTPResponseError {
-    var status: HTTPTypes.HTTPResponse.Status {
+extension PrivacyPass.PrivacyPassError: @retroactive HTTPResponseError {
+    public var status: HTTPTypes.HTTPResponse.Status {
         .badRequest
     }
 
-    var headers: HTTPTypes.HTTPFields {
+    public var headers: HTTPTypes.HTTPFields {
         [:]
     }
 
-    func body(allocator: NIOCore.ByteBufferAllocator) -> NIOCore.ByteBuffer? {
+    public func body(allocator: NIOCore.ByteBufferAllocator) -> NIOCore.ByteBuffer? {
         allocator.buffer(string: localizedDescription)
     }
 }
 
-extension TokenIssuerDirectory: ResponseGenerator {
-    func response(from request: HummingbirdCore.Request, context: some RequestContext) throws -> Response {
+extension TokenIssuerDirectory: @retroactive ResponseGenerator {
+    public func response(from request: HummingbirdCore.Request, context: some RequestContext) throws -> Response {
         try context.responseEncoder.encode(self, from: request, context: context)
     }
 }
 
-extension PrivacyPass.TokenResponse: ResponseGenerator {
-    func response(from _: HummingbirdCore.Request, context: some RequestContext) throws -> Response {
+extension PrivacyPass.TokenResponse: @retroactive ResponseGenerator {
+    public func response(from _: HummingbirdCore.Request, context: some RequestContext) throws -> Response {
         let body = context.allocator.buffer(bytes: bytes())
         return Response(
             status: .ok,
@@ -40,8 +41,8 @@ extension PrivacyPass.TokenResponse: ResponseGenerator {
     }
 }
 
-extension PrivacyPass.PublicKey: ResponseGenerator {
-    func response(from _: Request, context: some RequestContext) throws -> Response {
+extension PrivacyPass.PublicKey: @retroactive ResponseGenerator {
+    public func response(from _: Request, context: some RequestContext) throws -> Response {
         let body = try context.allocator.buffer(bytes: spki())
         return Response(status: .ok, body: .init(byteBuffer: body))
     }

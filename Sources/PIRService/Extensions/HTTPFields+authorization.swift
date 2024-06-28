@@ -9,6 +9,7 @@
 // repository, located at the URL above.
 
 import HTTPTypes
+import PrivacyPass
 
 extension HTTPFields {
     var bearerToken: String? {

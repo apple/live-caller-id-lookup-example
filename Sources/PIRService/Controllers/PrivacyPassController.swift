@@ -15,6 +15,7 @@ import Foundation
 @preconcurrency import Foundation
 #endif
 import Hummingbird
+import PrivacyPass
 
 struct PrivacyPassController<UserAuthenticator: UserTokenAuthenticator> {
     let state: PrivacyPassState<UserAuthenticator>
@@ -38,7 +39,7 @@ struct PrivacyPassController<UserAuthenticator: UserTokenAuthenticator> {
     func tokenIssuerDirectory(request _: Request, context _: AppContext) async throws -> TokenIssuerDirectory {
         let tokenKeys = try await state.issuers.values.map(\.privateKey.publicKey).map { publicKey in
             let spki = try publicKey.spki()
-            return TokenKey(
+            return TokenIssuerDirectory.TokenKey(
                 tokenType: PrivacyPass.TokenTypeBlindRSA,
                 tokenKeyBase64Url: spki.base64URLEncodedString(),
                 notBefore: nil)

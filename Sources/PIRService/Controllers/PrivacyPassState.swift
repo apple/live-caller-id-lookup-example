@@ -9,6 +9,7 @@
 // repository, located at the URL above.
 
 import Foundation
+import PrivacyPass
 
 protocol UserTokenAuthenticator: Sendable {
     func authenticate(userToken: String) async throws -> UserTier?

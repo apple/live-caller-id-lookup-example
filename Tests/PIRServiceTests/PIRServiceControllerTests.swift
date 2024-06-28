@@ -117,7 +117,7 @@ class PIRServiceControllerTests: XCTestCase {
             }
 
             let shardConfig = config.shardConfigs[0]
-            let keywordConfig: KeywordPirConfig = .init(
+            let keywordConfig: KeywordPirConfig = try .init(
                 dimensionCount: shardConfig.dimensions.count,
                 cuckooTableConfig: CuckooTableConfig
                     .defaultKeywordPir(maxSerializedBucketSize: context.bytesPerPlaintext),

@@ -9,9 +9,9 @@
 // repository, located at the URL above.
 
 import _CryptoExtras
+import Crypto
 import Foundation
-@testable import PIRService
-import TestUtil
+@testable import PrivacyPass
 import XCTest
 
 class PrivacyPassTests: XCTestCase {
@@ -19,6 +19,17 @@ class PrivacyPassTests: XCTestCase {
         let privateKey = try PrivacyPass.PrivateKey()
         let spki = try privateKey.publicKey.spki()
         _ = try PrivacyPass.PublicKey(fromSPKI: spki)
+    }
+
+    func testIssuance() throws {
+        let privateKey = try PrivacyPass.PrivateKey()
+        let publicKey = privateKey.publicKey
+        let preparedRequest = try publicKey.request(challenge: [1, 2, 3])
+        let issuer = try PrivacyPass.Issuer(privateKey: privateKey)
+        let response = try issuer.issue(request: preparedRequest.tokenRequest())
+        let token = try preparedRequest.finalize(response: response)
+        let verifier = PrivacyPass.Verifier(publicKey: publicKey)
+        XCTAssert(try verifier.verify(token: token))
     }
 
     func testVectors() throws {
@@ -58,14 +69,17 @@ class PrivacyPassTests: XCTestCase {
             // load private key
             let skS = try unhex(testVector.skS)
             let privateKeyPEM = try XCTUnwrap(String(decoding: Data(skS), as: UTF8.self))
-            let privateKey = try PrivacyPass
-                .PrivateKey(privateKey: _RSA.BlindSigning.PrivateKey(pemRepresentation: privateKeyPEM))
+            let privateKey = try PrivacyPass.PrivateKey(pemRepresentation: privateKeyPEM)
             // verify public key is correctly encoded
             let pkS = try unhex(testVector.pkS)
             let spki = try privateKey.publicKey.spki()
             XCTAssertEqual(spki, pkS)
             // verify we can load the public key directly from SPKI
-            _ = try PrivacyPass.PublicKey(fromSPKI: pkS)
+            let publicKey = try PrivacyPass.PublicKey(fromSPKI: pkS)
+            // construct token request
+            let tokenChallenge = try unhex(testVector.token_challenge)
+            // because we cannot feed in random bytes to blinding step, we will ignore the generated tokenRequest
+            _ = try publicKey.request(challenge: tokenChallenge)
             // load token request
             let tokenRequestBytes = try unhex(testVector.token_request)
             let tokenRequest = try PrivacyPass.TokenRequest(from: tokenRequestBytes)
@@ -77,10 +91,11 @@ class PrivacyPassTests: XCTestCase {
             let issuedResponse = try issuer.issue(request: tokenRequest)
             XCTAssertEqual(issuedResponse, tokenResponse)
             XCTAssertEqual(issuedResponse.bytes(), tokenResponseBytes)
-            // verify token validity
+            // load token
             let tokenBytes = try unhex(testVector.token)
             let token = try PrivacyPass.Token(from: tokenBytes)
             XCTAssertEqual(token.bytes(), tokenBytes)
+            // verify token validity
             let verifier = PrivacyPass.Verifier(publicKey: privateKey.publicKey)
             let verified = try verifier.verify(token: token)
             XCTAssertTrue(verified)

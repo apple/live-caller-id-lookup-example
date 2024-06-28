@@ -33,7 +33,7 @@ func buildExampleUsecase() throws -> Usecase {
     let databaseRows = (0..<100)
         .map { KeywordValuePair(keyword: [UInt8](String($0).utf8), value: [UInt8](String($0).utf8)) }
     let context: Context<ServerType.Scheme> = try .init(parameter: .init(from: .n_4096_logq_27_28_28_logt_4))
-    let config = KeywordPirConfig(
+    let config = try KeywordPirConfig(
         dimensionCount: 2,
         cuckooTableConfig: .defaultKeywordPir(maxSerializedBucketSize: context.bytesPerPlaintext),
         unevenDimensions: false)

@@ -8,15 +8,14 @@
 // with this file, please refer to the project's LICENSE in the project's
 // repository, located at the URL above.
 
-extension PrivacyPass {
-    enum PrivacyPassError: Error, Equatable {
-        case invalidKeySize
-        case invalidTokenType
-        case invalidTokenKeyId
-        case invalidTokenRequestSize
-        case invalidTokenRequestBlindedMessageSize
-        case invalidSPKIFormat
-        case invalidTokenResponseSize
-        case invalidTokenSize
-    }
-}
+import _CryptoExtras
+import Crypto
+
+typealias BackingPrivateKey = _RSA.BlindSigning.PrivateKey<SHA384>
+typealias BackingPublicKey = _RSA.BlindSigning.PublicKey<SHA384>
+
+public let TokenTypeBlindRSA: UInt16 = 2
+let TokenTypeBlindRSAKeySizeInBits: Int = 2048
+let TokenTypeBlindRSANK: Int = 256
+let TokenTypeBlindRSASaltLength: Int = 48
+let TokenTypeBlindRSAParams: _RSA.BlindSigning.Parameters = .RSABSSA_SHA384_PSS_Deterministic

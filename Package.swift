@@ -23,16 +23,17 @@ let package = Package(
     products: [
         .executable(name: "PIRService", targets: ["PIRService"]),
         .executable(name: "ConstructDatabase", targets: ["ConstructDatabase"]),
+        .library(name: "PrivacyPass", targets: ["PrivacyPass"]),
     ],
     dependencies: [
         // TODO: need to switch to a repository URL & a version number
         .package(url: "git@github.pie.apple.com:SIMLCryptoAndPrivacy/swift-he.git", branch: "main"),
         .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.2.0"),
         .package(url: "https://github.com/apple/swift-asn1.git", .upToNextMajor(from: "1.0.0")),
+        .package(url: "https://github.com/apple/swift-crypto.git", from: "3.5.0"),
         .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.0.0"),
-        .package(url: "https://github.com/hummingbird-project/hummingbird", exact: "2.0.0-beta.8"),
-        .package(url: "https://github.pie.apple.com/si-beaumont/swift-crypto", revision: "3.4.0+rsabssa.alpha.1"),
         .package(url: "https://github.com/apple/swift-protobuf.git", from: "1.6.0"),
+        .package(url: "https://github.com/hummingbird-project/hummingbird", exact: "2.0.0-beta.8"),
     ],
     targets: [
         .executableTarget(
@@ -46,6 +47,7 @@ let package = Package(
                 // when moving to proper package url
                 .product(name: "HomomorphicEncryptionProtobuf", package: "swift-he"),
                 .product(name: "PrivateInformationRetrievalProtobuf", package: "swift-he"),
+                "PrivacyPass",
             ],
             swiftSettings: swiftSettings),
         .testTarget(
@@ -55,7 +57,6 @@ let package = Package(
                 .product(name: "HummingbirdTesting", package: "hummingbird"),
                 .product(name: "TestUtil", package: "swift-he"),
             ],
-            exclude: ["TestVectors/PrivacyPassPublicTokens.json"],
             swiftSettings: swiftSettings),
         .executableTarget(
             name: "ConstructDatabase",
@@ -66,4 +67,19 @@ let package = Package(
                 .product(name: "PrivateInformationRetrievalProtobuf", package: "swift-he"),
                 .product(name: "SwiftProtobuf", package: "swift-protobuf"),
             ]),
+        .target(
+            name: "PrivacyPass",
+            dependencies: [
+                .product(name: "Crypto", package: "swift-crypto"),
+                .product(name: "_CryptoExtras", package: "swift-crypto"),
+                .product(name: "SwiftASN1", package: "swift-asn1"),
+            ]),
+        .testTarget(
+            name: "PrivacyPassTests",
+            dependencies: [
+                .product(name: "Crypto", package: "swift-crypto"),
+                .product(name: "_CryptoExtras", package: "swift-crypto"),
+                .byName(name: "PrivacyPass"),
+            ],
+            exclude: ["TestVectors/PrivacyPassPublicTokens.json"]),
     ])
