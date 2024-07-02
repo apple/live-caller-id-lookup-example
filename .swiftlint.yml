@@ -56,7 +56,6 @@ opt_in_rules:
   - discouraged_none_name
   - discouraged_object_literal
   - discouraged_optional_boolean
-  - discouraged_optional_collection
   - empty_collection_literal
   - empty_count
   - empty_string
@@ -150,6 +149,7 @@ opt_in_rules:
 
 # Don't enable due to preference
 # - cyclomatic_complexity
+# - discouraged_optional_collection
 # - explicit_acl
 # - explicit_enum_raw_value
 # - explicit_top_level_acl

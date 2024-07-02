@@ -14,6 +14,10 @@ import Crypto
 typealias BackingPrivateKey = _RSA.BlindSigning.PrivateKey<SHA384>
 typealias BackingPublicKey = _RSA.BlindSigning.PublicKey<SHA384>
 
+/// Token type for Blind RSA (2048-bit).
+///
+/// - seealso: [RFC 9578: Privacy Pass Token
+/// Types](https://www.rfc-editor.org/rfc/rfc9578#name-privacy-pass-token-types)
 public let TokenTypeBlindRSA: UInt16 = 2
 let TokenTypeBlindRSAKeySizeInBits: Int = 2048
 let TokenTypeBlindRSANK: Int = 256

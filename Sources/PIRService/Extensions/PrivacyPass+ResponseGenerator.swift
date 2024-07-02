@@ -13,7 +13,20 @@ import PrivacyPass
 
 extension PrivacyPass.PrivacyPassError: @retroactive HTTPResponseError {
     public var status: HTTPTypes.HTTPResponse.Status {
-        .badRequest
+        // Default to `.badRequest` however, some erros types are specified to return HTTP 422.
+        // From: https://www.rfc-editor.org/rfc/rfc9578#name-issuer-to-client-response-2
+        // If any of these conditions are not met, the Issuer MUST return an HTTP 422 (Unprocessable Content) error to
+        // the Client.
+        switch self {
+        case .invalidTokenKeyId:
+            .unprocessableContent
+        case .invalidTokenRequestBlindedMessageSize:
+            .unprocessableContent
+        case .invalidTokenType:
+            .unprocessableContent
+        default:
+            .badRequest
+        }
     }
 
     public var headers: HTTPTypes.HTTPFields {

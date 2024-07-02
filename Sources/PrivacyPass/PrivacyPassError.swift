@@ -8,6 +8,7 @@
 // with this file, please refer to the project's LICENSE in the project's
 // repository, located at the URL above.
 
+/// Privacy Pass error.
 public enum PrivacyPassError: Error, Equatable, Sendable {
     case invalidKeySize
     case invalidSPKIFormat

@@ -13,6 +13,7 @@ import Crypto
 import Foundation
 import SwiftASN1
 
+/// Public key.
 public struct PublicKey: Sendable {
     private static var rsassaPSSParams: RSASSAPSSParams {
         // swiftlint:disable:next force_try
@@ -26,11 +27,30 @@ public struct PublicKey: Sendable {
     }
 
     let backing: BackingPublicKey
+    /// Token key identifier.
+    ///
+    /// SHA256 of the ``spki()``.
+    /// - seealso: [RFC 9578: Issuer Configuration](https://www.rfc-editor.org/rfc/rfc9578#name-issuer-configuration-2)
+    public let tokenKeyId: [UInt8]
+    /// Truncated token key identifier.
+    ///
+    /// The last byte of token key identifier.
+    public var truncatedTokenKeyId: UInt8 {
+        // safe to unwrap, because tokenKeyId is never empty
+        // swiftlint:disable:next force_unwrapping
+        tokenKeyId.last!
+    }
 
     init(publicKey: BackingPublicKey) {
         self.backing = publicKey
+        // this should not throw
+        // swiftlint:disable:next force_try
+        self.tokenKeyId = try! Self.tokenKeyId(backing: publicKey)
     }
 
+    /// Load a public key from a DER encoded `SubjectPublicKeyInfo` (SPKI) object.
+    /// - Parameter derRepresentation: DER enconding of SPKI object.
+    /// - seealso: [RFC 9578: Issuer Configuration](https://www.rfc-editor.org/rfc/rfc9578#name-issuer-configuration-2)
     public init(fromSPKI derRepresentation: [UInt8]) throws {
         let rootNode = try DER.parse(derRepresentation)
         var spki = try PrivacyPass.SubjectPublicKeyInfo(derEncoded: rootNode)
@@ -50,12 +70,13 @@ public struct PublicKey: Sendable {
             explicitlyEncodeNil: true)
         var serializer = DER.Serializer()
         try serializer.serialize(spki)
-        self.backing = try .init(
+        let backing = try BackingPublicKey(
             derRepresentation: serializer.serializedBytes,
             parameters: .RSABSSA_SHA384_PSS_Deterministic)
+        self.init(publicKey: backing)
     }
 
-    public func spki() throws -> [UInt8] {
+    private static func spki(backing: BackingPublicKey) throws -> [UInt8] {
         let bytes = Array(backing.derRepresentation)
         let rootNode = try DER.parse(bytes)
         var spki = try PrivacyPass.SubjectPublicKeyInfo(derEncoded: rootNode)
@@ -69,18 +90,19 @@ public struct PublicKey: Sendable {
         return serializer.serializedBytes
     }
 
-    func tokenKeyID() throws -> [UInt8] {
-        let spki = try spki()
+    private static func tokenKeyId(backing: BackingPublicKey) throws -> [UInt8] {
+        let spki = try Self.spki(backing: backing)
         let digest = SHA256.hash(data: spki)
         return digest.withUnsafeBytes { digestBuffer in
             Array(digestBuffer)
         }
     }
 
-    func truncatedTokenKeyID() throws -> UInt8 {
-        // safe to unwrap, because tokenKeyID is never empty
-        // swiftlint:disable:next force_unwrapping
-        try tokenKeyID().last!
+    /// Convert the key to DER-encoded `SubjectPublicKeyInfo` (SPKI) object.
+    /// - Returns: DER-encoded SPKI object.
+    /// - seealso: [RFC 9578: Issuer Configuration](https://www.rfc-editor.org/rfc/rfc9578#name-issuer-configuration-2)
+    public func spki() throws -> [UInt8] {
+        try Self.spki(backing: backing)
     }
 }
 

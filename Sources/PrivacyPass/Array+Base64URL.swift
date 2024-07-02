@@ -11,6 +11,8 @@
 import Foundation
 
 public extension [UInt8] {
+    /// Initialize a byte array from base64url encoded string.
+    /// - Parameter string: base64url encoded string.
     init?(base64URLEncoded string: String) {
         let base64Encoded = string
             .replacingOccurrences(of: "-", with: "+")
@@ -19,6 +21,8 @@ public extension [UInt8] {
         self.init(base64Encoded: base64Encoded)
     }
 
+    /// Initialize a byte array from base64 encoded string.
+    /// - Parameter base64Encoded: base64 encoded string.
     init?(base64Encoded: String) {
         guard let data = Data(base64Encoded: base64Encoded) else {
             return nil
@@ -26,6 +30,8 @@ public extension [UInt8] {
         self.init(data)
     }
 
+    /// Return a base64url encoded version of the array.
+    /// - Returns: Valid base64url encoding fo the aray.
     func base64URLEncodedString() -> String {
         Data(self).base64EncodedString()
             .replacingOccurrences(of: "+", with: "-")

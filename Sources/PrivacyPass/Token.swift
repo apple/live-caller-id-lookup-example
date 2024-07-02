@@ -8,15 +8,18 @@
 // with this file, please refer to the project's LICENSE in the project's
 // repository, located at the URL above.
 
-/*
- struct {
- uint16_t token_type = 0x0002; /* Type Blind RSA (2048-bit) */
- uint8_t nonce[32];
- uint8_t challenge_digest[32];
- uint8_t token_key_id[32];
- uint8_t authenticator[Nk];
- } Token;
- */
+/// Privacy Pass Token.
+///
+/// This is the token struct.
+/// ```
+/// struct {
+///   uint16_t token_type = 0x0002; /* Type Blind RSA (2048-bit) */
+///   uint8_t nonce[32];
+///   uint8_t challenge_digest[32];
+///   uint8_t token_key_id[32];
+///   uint8_t authenticator[Nk];
+/// } Token;
+/// ```
 public struct Token: Equatable {
     static let nonceSize = 32
     static let challengeDigestSize = 32
@@ -25,12 +28,27 @@ public struct Token: Equatable {
     static let sizeInBytes = MemoryLayout<UInt16>
         .size + nonceSize + challengeDigestSize + tokenKeyIdSize + authenticatorSize
 
+    /// Token type.
     public let tokenType: UInt16
+    /// Unique nonce for the token.
     public let nonce: [UInt8]
+    /// Challenge digest.
     public let challengeDigest: [UInt8]
+    /// Token key identifier.
     public let tokenKeyId: [UInt8]
+    /// Token authenticator.
     public let authenticator: [UInt8]
 
+    /// Initialize a Token.
+    ///
+    /// - Warning: This initializer is probably unneeded. Please use ``PreparedRequest/finalize(response:)`` to obtain a
+    /// token.
+    /// - Parameters:
+    ///   - tokenType: Token type.
+    ///   - nonce: Nonce.
+    ///   - challengeDigest: Challenge digest.
+    ///   - tokenKeyId: Token key identitifer.
+    ///   - authenticator: Authenticator.
     public init(
         tokenType: UInt16,
         nonce: [UInt8],
@@ -45,6 +63,8 @@ public struct Token: Equatable {
         self.authenticator = authenticator
     }
 
+    /// Load a Private Pass Token from bytes.
+    /// - Parameter bytes: Collection of bytes representing a token.
     public init<C: Collection<UInt8>>(from bytes: C) throws {
         guard bytes.count == Self.sizeInBytes else {
             throw PrivacyPassError.invalidTokenSize
@@ -66,6 +86,8 @@ public struct Token: Equatable {
         self.authenticator = Array(extractBytes(count: Self.authenticatorSize))
     }
 
+    /// Convert to byte array.
+    /// - Returns: A binary representation of the token.
     public func bytes() -> [UInt8] {
         var bytes: [UInt8] = []
         bytes.reserveCapacity(Self.sizeInBytes)

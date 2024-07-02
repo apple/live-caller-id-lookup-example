@@ -26,7 +26,7 @@ class PrivacyPassTests: XCTestCase {
         let publicKey = privateKey.publicKey
         let preparedRequest = try publicKey.request(challenge: [1, 2, 3])
         let issuer = try PrivacyPass.Issuer(privateKey: privateKey)
-        let response = try issuer.issue(request: preparedRequest.tokenRequest())
+        let response = try issuer.issue(request: preparedRequest.tokenRequest)
         let token = try preparedRequest.finalize(response: response)
         let verifier = PrivacyPass.Verifier(publicKey: publicKey)
         XCTAssert(try verifier.verify(token: token))

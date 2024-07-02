@@ -8,20 +8,28 @@
 // with this file, please refer to the project's LICENSE in the project's
 // repository, located at the URL above.
 
-/*
- struct {
- uint8_t blind_sig[Nk];
- } TokenResponse;
- */
+/// Privacy Pass token response.
+///
+/// This the token response struct.
+/// ```
+/// struct {
+///   uint8_t blind_sig[Nk];
+/// } TokenResponse;
+/// ```
 public struct TokenResponse: Equatable {
     static let sizeInBytes = TokenTypeBlindRSANK
 
-    let blindSignature: [UInt8]
+    /// The blind signature of the token.
+    public let blindSignature: [UInt8]
 
+    /// Initialize a token response.
+    /// - Parameter blindSignature: The blind signature to use in the response.
     public init(blindSignature: [UInt8]) {
         self.blindSignature = blindSignature
     }
 
+    /// Load a Private Pass Token response from bytes.
+    /// - Parameter bytes: Collection of bytes representing a token reponse.
     public init(from bytes: some Collection<UInt8>) throws {
         guard bytes.count == Self.sizeInBytes else {
             throw PrivacyPassError.invalidTokenResponseSize
@@ -29,6 +37,8 @@ public struct TokenResponse: Equatable {
         self.blindSignature = Array(bytes)
     }
 
+    /// Convert to byte array.
+    /// - Returns: A binary representation of the token response.
     public func bytes() -> [UInt8] {
         blindSignature
     }

@@ -10,22 +10,39 @@
 
 import _CryptoExtras
 
+/// Token Issuer.
 public struct Issuer: Sendable {
+    /// Private key.
     public let privateKey: PrivateKey
+    /// Truncated token key ID.
     public let truncatedTokenKeyId: UInt8
 
+    /// Public key.
     public var publicKey: PublicKey {
         privateKey.publicKey
     }
 
+    /// Initialize a token issuer.
+    /// - Parameter privateKey: Private key to use for issuing tokens.
     public init(privateKey: PrivateKey) throws {
         guard privateKey.backing.keySizeInBits == TokenTypeBlindRSAKeySizeInBits else {
             throw PrivacyPassError.invalidKeySize
         }
         self.privateKey = privateKey
-        self.truncatedTokenKeyId = try privateKey.publicKey.truncatedTokenKeyID()
+        self.truncatedTokenKeyId = privateKey.publicKey.truncatedTokenKeyId
     }
 
+    /// Issue a token response.
+    ///
+    /// Checks that request has:
+    /// - correct token type,
+    /// - correct truncated token key identitifer,
+    /// - correct blindend message length.
+    /// - Parameter request: The token request.
+    /// - Returns: Token response.
+    /// - Throws: If any of the checks on the token request fail an error will be thrown.
+    /// - seealso: [RFC 9578: Issuer-to-Client
+    /// Response](https://www.rfc-editor.org/rfc/rfc9578#name-issuer-to-client-response-2)
     public func issue(request: TokenRequest) throws -> TokenResponse {
         guard request.tokenType == TokenTypeBlindRSA else {
             throw PrivacyPassError.invalidTokenType

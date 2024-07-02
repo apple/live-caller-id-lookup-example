@@ -8,27 +8,42 @@
 // with this file, please refer to the project's LICENSE in the project's
 // repository, located at the URL above.
 
-/*
- struct {
-   uint16_t token_type = 0x0002; /* Type Blind RSA (2048-bit) */
-   uint8_t truncated_token_key_id;
-   uint8_t blinded_msg[Nk];
- } TokenRequest;
- */
+/// Privacy Pass Token request.
+///
+/// This is the token request struct.
+/// ```
+/// struct {
+///   uint16_t token_type = 0x0002; /* Type Blind RSA (2048-bit) */
+///   uint8_t truncated_token_key_id;
+///   uint8_t blinded_msg[Nk];
+/// } TokenRequest;
+/// ```
 public struct TokenRequest: Equatable {
     public static let blindedMsgSize = TokenTypeBlindRSANK
     public static let sizeInBytes = MemoryLayout<UInt16>.size + MemoryLayout<UInt8>.size + blindedMsgSize
 
-    let tokenType: UInt16
-    let truncatedTokenKeyId: UInt8
-    let blindedMsg: [UInt8]
+    /// Token type.
+    public let tokenType: UInt16
+    /// Truncated Token Key identifier.
+    public let truncatedTokenKeyId: UInt8
+    /// Blinded message.
+    public let blindedMsg: [UInt8]
 
+    /// Initialize a token request.
+    ///
+    /// - Parameters:
+    ///   - tokenType: Token type.
+    ///   - truncatedTokenKeyId: Truncated token key identifier of the public key.
+    ///   - blindedMsg: Blinded message
+    /// - seealso: ``PreparedRequest/tokenRequest``.
     public init(tokenType: UInt16, truncatedTokenKeyId: UInt8, blindedMsg: [UInt8]) {
         self.tokenType = tokenType
         self.truncatedTokenKeyId = truncatedTokenKeyId
         self.blindedMsg = blindedMsg
     }
 
+    /// Load a Private Pass Token request from bytes.
+    /// - Parameter bytes: Collection of bytes representing a token request.
     public init<C: Collection<UInt8>>(from bytes: C) throws {
         guard bytes.count == Self.sizeInBytes else {
             throw PrivacyPassError.invalidTokenRequestSize
@@ -49,6 +64,8 @@ public struct TokenRequest: Equatable {
         self.blindedMsg = Array(extractBytes(count: Self.blindedMsgSize))
     }
 
+    /// Convert to byte array.
+    /// - Returns: A binary representation of the token request.
     public func bytes() -> [UInt8] {
         var bytes: [UInt8] = []
         bytes.reserveCapacity(Self.sizeInBytes)
