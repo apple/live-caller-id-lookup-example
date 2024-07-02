@@ -44,7 +44,7 @@ struct PirUsecase<PirScheme: IndexPirServer>: Usecase {
         let parameterPath = "\(fileStem)-0.params.txtpb"
         let params = try Apple_SwiftHomomorphicEncryption_Pir_V1_PirParameters(from: parameterPath)
         let encryptionParams: EncryptionParameters<Scheme> = try params.encryptionParameters.native()
-        let context: Context<Scheme> = try Context(parameter: encryptionParams)
+        let context: Context<Scheme> = try Context(encryptionParameters: encryptionParams)
         self.context = context
         self.keywordParams = params.keywordPirParams.native()
         self.shards = try (0..<shardCount).map { shardIndex in
@@ -52,11 +52,11 @@ struct PirUsecase<PirScheme: IndexPirServer>: Usecase {
             let databasePath = "\(fileStem)-\(shardIndex).bin"
             let pirParams = try Apple_SwiftHomomorphicEncryption_Pir_V1_PirParameters(from: parameterPath)
             let encryptionParams: EncryptionParameters<Scheme> = try pirParams.encryptionParameters.native()
-            guard encryptionParams == context.parameter else {
+            guard encryptionParams == context.encryptionParameters else {
                 throw LoadingError.invalidParameters(
                     shard: parameterPath,
                     got: encryptionParams,
-                    expected: context.parameter)
+                    expected: context.encryptionParameters)
             }
 
             let database = try ProcessedDatabase(from: databasePath, context: context)
@@ -90,7 +90,7 @@ struct PirUsecase<PirScheme: IndexPirServer>: Usecase {
 
     func config() throws -> Apple_SwiftHomomorphicEncryption_Api_V1_Config {
         var pirConfig = Apple_SwiftHomomorphicEncryption_Api_V1_PIRConfig()
-        pirConfig.encryptionParameters = try context.parameter.proto()
+        pirConfig.encryptionParameters = try context.encryptionParameters.proto()
         pirConfig.shardConfigs = shards.map { shard in
             shard.indexPirParameter.proto()
         }
@@ -102,6 +102,6 @@ struct PirUsecase<PirScheme: IndexPirServer>: Usecase {
     }
 
     func evaluationKeyConfig() throws -> Apple_SwiftHomomorphicEncryption_V1_EvaluationKeyConfig {
-        try shards.map(\.evaluationKeyConfiguration).union().proto(parameter: context.parameter)
+        try shards.map(\.evaluationKeyConfiguration).union().proto(encryptionParameters: context.encryptionParameters)
     }
 }

@@ -27,7 +27,9 @@ let package = Package(
     ],
     dependencies: [
         // TODO: need to switch to a repository URL & a version number
-        .package(url: "git@github.pie.apple.com:SIMLCryptoAndPrivacy/swift-he.git", branch: "main"),
+        .package(
+            url: "git@github.pie.apple.com:SIMLCryptoAndPrivacy/swift-he.git",
+            revision: "a59c7d32316e4d60306ddd7edf615aa6e6c075a6"),
         .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.2.0"),
         .package(url: "https://github.com/apple/swift-asn1.git", .upToNextMajor(from: "1.0.0")),
         .package(url: "https://github.com/apple/swift-crypto.git", from: "3.5.0"),

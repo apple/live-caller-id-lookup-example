@@ -96,7 +96,7 @@ class PIRServiceControllerTests: XCTestCase {
         let user = UserIdentifier()
         // swiftlint:disable:next closure_body_length
         try await app.test(.live) { client in
-            let context: Context<Scheme> = try .init(parameter: .init(from: .n_4096_logq_27_28_28_logt_4))
+            let context: Context<Scheme> = try .init(encryptionParameters: .init(from: .n_4096_logq_27_28_28_logt_4))
 
             // MARK: get configuration
 
