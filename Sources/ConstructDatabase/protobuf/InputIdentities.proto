@@ -17,15 +17,15 @@ syntax = "proto3";
 import "CallIdentity.proto";
 
 message InputCallIdentity {
-    // identity information
-    string name = 1;
-    // how many minutes to keep this entry in the cache
-    uint32 cache_expiry_minutes = 2;
-    // should we block it
-    bool block = 3;
-    IdentityCategory category = 4;
+  // identity information
+  string name = 1;
+  // how many minutes to keep this entry in the cache
+  uint32 cache_expiry_minutes = 2;
+  // should we block it
+  bool block = 3;
+  IdentityCategory category = 4;
 }
 
 message InputIdentities {
-    map<string, InputCallIdentity> identities = 1;
+  map<string, InputCallIdentity> identities = 1;
 }

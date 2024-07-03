@@ -14,29 +14,44 @@
 
 syntax = "proto3";
 
+// Image format.
 enum ImageFormat {
-    IMAGE_FORMAT_UNSPECIFIED = 0;
-    IMAGE_FORMAT_HEIC = 1;
+  // Unspecified format.
+  IMAGE_FORMAT_UNSPECIFIED = 0;
+  // High Efficiency Image File Format (HEIF / HEIC).
+  IMAGE_FORMAT_HEIC = 1;
 }
 
+// Identity Category.
+//
+// The system might show identity information differently based on the category.
 enum IdentityCategory {
-    IDENTITY_CATEGORY_UNSPECIFIED = 0;
-    IDENTITY_CATEGORY_PERSON = 1;
-    IDENTITY_CATEGORY_BUSINESS = 2;
+  // Unspecified category.
+  IDENTITY_CATEGORY_UNSPECIFIED = 0;
+  // Person category.
+  IDENTITY_CATEGORY_PERSON = 1;
+  // Business category.
+  IDENTITY_CATEGORY_BUSINESS = 2;
 }
 
+// Icon
 message Icon {
-    ImageFormat format = 1;
-    bytes image = 2;
+  // Image format for the icon
+  ImageFormat format = 1;
+  // Encoded image in the specified format.
+  bytes image = 2;
 }
 
+// Caller Identity
 message CallIdentity {
-    // identity information
-    string name = 1;
-    // icon
-    Icon icon = 2;
-    // how many minutes to keep this entry in the cache
-    uint32 cache_expiry_minutes = 3;
-    // identity category
-    IdentityCategory category = 4;
+  // Identity information.
+  string name = 1;
+  // Icon to be displayed with the identity.
+  Icon icon = 2;
+  // Cache expiry minutes.
+  //
+  // The system will reuse this response for this many minutes before requesting it again.
+  uint32 cache_expiry_minutes = 3;
+  // Identity category.
+  IdentityCategory category = 4;
 }

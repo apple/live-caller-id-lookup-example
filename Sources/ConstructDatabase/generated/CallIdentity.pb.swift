@@ -34,9 +34,14 @@ fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAP
   typealias Version = _2
 }
 
+/// Image format.
 enum ImageFormat: SwiftProtobuf.Enum {
   typealias RawValue = Int
+
+  /// Unspecified format.
   case unspecified // = 0
+
+  /// High Efficiency Image File Format (HEIF / HEIC).
   case heic // = 1
   case UNRECOGNIZED(Int)
 
@@ -74,10 +79,19 @@ extension ImageFormat: CaseIterable {
 
 #endif  // swift(>=4.2)
 
+/// Identity Category.
+///
+/// The system might show identity information differently based on the category.
 enum IdentityCategory: SwiftProtobuf.Enum {
   typealias RawValue = Int
+
+  /// Unspecified category.
   case unspecified // = 0
+
+  /// Person category.
   case person // = 1
+
+  /// Business category.
   case business // = 2
   case UNRECOGNIZED(Int)
 
@@ -118,13 +132,16 @@ extension IdentityCategory: CaseIterable {
 
 #endif  // swift(>=4.2)
 
+/// Icon
 struct Icon {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
+  /// Image format for the icon
   var format: ImageFormat = .unspecified
 
+  /// Encoded image in the specified format.
   var image: Data = Data()
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
@@ -132,15 +149,16 @@ struct Icon {
   init() {}
 }
 
+/// Caller Identity
 struct CallIdentity {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  /// identity information
+  /// Identity information.
   var name: String = String()
 
-  /// icon
+  /// Icon to be displayed with the identity.
   var icon: Icon {
     get {return _icon ?? Icon()}
     set {_icon = newValue}
@@ -150,10 +168,12 @@ struct CallIdentity {
   /// Clears the value of `icon`. Subsequent reads from it will return its default value.
   mutating func clearIcon() {self._icon = nil}
 
-  /// how many minutes to keep this entry in the cache
+  /// Cache expiry minutes.
+  ///
+  /// The system will reuse this response for this many minutes before requesting it again.
   var cacheExpiryMinutes: UInt32 = 0
 
-  /// identity category
+  /// Identity category.
   var category: IdentityCategory = .unspecified
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
