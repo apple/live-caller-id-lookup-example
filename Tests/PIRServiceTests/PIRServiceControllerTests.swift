@@ -27,6 +27,24 @@ class PIRServiceControllerTests: XCTestCase {
         try! buildExampleUsecase()
     }
 
+    private static func buildExampleUsecase() throws -> Usecase {
+        typealias ServerType = KeywordPirServer<MulPirServer<Bfv<UInt64>>>
+        let databaseRows = (0..<100)
+            .map { KeywordValuePair(keyword: [UInt8](String($0).utf8), value: [UInt8](String($0).utf8)) }
+        let context: Context<ServerType.Scheme> =
+            try .init(encryptionParameters: .init(from: .n_4096_logq_27_28_28_logt_4))
+        let config = try KeywordPirConfig(
+            dimensionCount: 2,
+            cuckooTableConfig: .defaultKeywordPir(maxSerializedBucketSize: context.bytesPerPlaintext),
+            unevenDimensions: false)
+        let processed = try ServerType.process(
+            database: databaseRows,
+            config: config,
+            with: context)
+        let shard = try ServerType(context: context, processed: processed)
+        return PirUsecase(context: context, keywordParams: config.parameter, shards: [shard])
+    }
+
     func testNoUserIdentifier() async throws {
         let app = try await buildApplication()
         try await app.test(.live) { client in

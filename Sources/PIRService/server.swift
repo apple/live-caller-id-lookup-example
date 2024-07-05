@@ -34,41 +34,29 @@ struct ServerCommand: AsyncParsableCommand {
 
     @Option var hostname: String = "127.0.0.1"
     @Option var port: Int = 8080
-    @Option var configFile: String?
-    @Argument var usecases: [String] = []
-    @Flag var test = false
+    @Argument var configFile: String
 
     func run() async throws {
         var privacyPassState: PrivacyPassState<UserAuthenticator>?
         let usecaseStore = UsecaseStore()
-        if test {
-            try await usecaseStore.set(name: "test", usecase: buildExampleUsecase())
-        }
 
-        for name in usecases {
-            let usecase = try loadUsecase(from: name, shardCount: 1)
-            await usecaseStore.set(name: name, usecase: usecase)
-        }
+        let configURL = URL(fileURLWithPath: configFile)
+        let configData = try Data(contentsOf: configURL)
+        let config = try JSONDecoder().decode(ServerConfiguration.self, from: configData)
 
-        if let configFile {
-            let configURL = URL(fileURLWithPath: configFile)
-            let configData = try Data(contentsOf: configURL)
-            let config = try JSONDecoder().decode(ServerConfiguration.self, from: configData)
-
-            if !config.users.isEmpty {
-                let authenticator = UserAuthenticator()
-                for (tier, users) in config.users {
-                    for user in users {
-                        await authenticator.add(token: user, tier: tier)
-                    }
+        if !config.users.isEmpty {
+            let authenticator = UserAuthenticator()
+            for (tier, users) in config.users {
+                for user in users {
+                    await authenticator.add(token: user, tier: tier)
                 }
-                privacyPassState = try .init(userAuthenticator: authenticator)
             }
+            privacyPassState = try .init(userAuthenticator: authenticator)
+        }
 
-            for usecase in config.usecases {
-                let loaded = try loadUsecase(from: usecase.fileStem, shardCount: usecase.shardCount)
-                await usecaseStore.set(name: usecase.name, usecase: loaded)
-            }
+        for usecase in config.usecases {
+            let loaded = try loadUsecase(from: usecase.fileStem, shardCount: usecase.shardCount)
+            await usecaseStore.set(name: usecase.name, usecase: loaded)
         }
 
         let app = try await buildApplication(
