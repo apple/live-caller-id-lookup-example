@@ -23,7 +23,6 @@ struct ServerConfiguration: Codable {
         let shardCount: Int
     }
 
-    let issuerRequestUri: String
     let users: [UserTier: [String]]
     let usecases: [Usecase]
 }
@@ -63,10 +62,7 @@ struct ServerCommand: AsyncParsableCommand {
                         await authenticator.add(token: user, tier: tier)
                     }
                 }
-                guard let issuerRequestUri = URL(string: config.issuerRequestUri) else {
-                    throw ValidationError("invalid issuerRequestUri: \(config.issuerRequestUri)")
-                }
-                privacyPassState = try .init(issuerRequestUri: issuerRequestUri, userAuthenticator: authenticator)
+                privacyPassState = try .init(userAuthenticator: authenticator)
             }
 
             for usecase in config.usecases {
