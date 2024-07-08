@@ -66,6 +66,7 @@ struct PirUsecase<PirScheme: IndexPirServer>: Usecase {
             let database = try ProcessedDatabase(from: databasePath, context: context)
             let processed = ProcessedDatabaseWithParameters(
                 database: database,
+                evaluationKeyConfiguration: pirParams.evaluationKeyConfig.native(),
                 pirParameter: pirParams.native(),
                 keywordPirParameter: pirParams.keywordPirParams.native())
             return try KeywordPirServer(context: context, processed: processed)
