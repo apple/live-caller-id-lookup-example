@@ -23,6 +23,7 @@ struct ServerConfiguration: Codable {
         let shardCount: Int
     }
 
+    let issuerRequestUri: String?
     let users: [UserTier: [String]]
     let usecases: [Usecase]
 }
@@ -51,7 +52,18 @@ struct ServerCommand: AsyncParsableCommand {
                     await authenticator.add(token: user, tier: tier)
                 }
             }
-            privacyPassState = try .init(userAuthenticator: authenticator)
+
+            var issuerRequestUri: URL
+            if let issuerRequestUriString = config.issuerRequestUri {
+                guard let parsed = URL(string: issuerRequestUriString) else {
+                    throw ValidationError("invalid issuerRequestUri: \(issuerRequestUriString)")
+                }
+                issuerRequestUri = parsed
+            } else {
+                // swiftlint:disable:next force_unwrapping
+                issuerRequestUri = URL(string: "/issue")!
+            }
+            privacyPassState = try .init(issuerRequestUri: issuerRequestUri, userAuthenticator: authenticator)
         }
 
         for usecase in config.usecases {

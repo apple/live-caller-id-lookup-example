@@ -25,13 +25,14 @@ actor PrivacyPassState<UserAuthenticator: UserTokenAuthenticator> {
         let tier: UserTier
     }
 
+    let issuerRequestUri: URL
     let userAuthenticator: UserAuthenticator
     // map from tier to issuer
     var issuers: [UserTier: PrivacyPass.Issuer]
     // map from truncate key id to verifier & tier
     var verifiers: [UInt8: TieredVerifier]
 
-    init(userAuthenticator: UserAuthenticator) throws {
+    init(issuerRequestUri: URL, userAuthenticator: UserAuthenticator) throws {
         var issuers: [UserTier: PrivacyPass.Issuer] = [:]
         var verifiers: [UInt8: TieredVerifier] = [:]
         // generate issuers for each user tier and avoid truncated key id collisions
@@ -46,6 +47,7 @@ actor PrivacyPassState<UserAuthenticator: UserTokenAuthenticator> {
                 tier: tier)
         }
 
+        self.issuerRequestUri = issuerRequestUri
         self.userAuthenticator = userAuthenticator
         self.issuers = issuers
         self.verifiers = verifiers

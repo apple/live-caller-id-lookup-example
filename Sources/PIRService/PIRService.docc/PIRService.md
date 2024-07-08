@@ -196,6 +196,7 @@ Copy the following to a file called `service-config.json`.
 
 ```json
 {
+  "issuerRequestUri": "http://lookup.example.net/issue",
   "users": [
     {
       "tier1": {}
@@ -228,9 +229,14 @@ Copy the following to a file called `service-config.json`.
 
 This configuration file has 3 sections.
 
-1. `users` - This is a mapping from user tiers to User Tokens that are allowed for that tier. The User tokens are
+1. `issuerRequestUri` - This URL will be included in the Privacy Pass token issuer directory. It needs to end with
+   `/issue` and point to the address of your service. In this example we assume that the service will be reachable at
+   `http://lookup.example.net`.
+> Note: This value can be omitted from the configuration. Setting this explicitly will not be required for devices using
+> iOS 18.0 beta 4 or later.
+2. `users` - This is a mapping from user tiers to User Tokens that are allowed for that tier. The User tokens are
    already base64 encoded as they appear in the HTTP `Authorization` header.
-2. `usecases` - This is a list of usecases, where each usecase has the `fileStem`, `shardCount`, and `name`. When
+3. `usecases` - This is a list of usecases, where each usecase has the `fileStem`, `shardCount`, and `name`. When
    loading the usecase, `PIRService` does something like:
 ```swift
 self.shards = try (0..<shardCount).map { shardIndex in
@@ -290,6 +296,8 @@ the device find your Mac. Let's assume that your Mac's hostname is `Tims-MacBook
 
 Then we should use the following value for the URLs: `http://Tims-Macbook-Pro.local:8080`. Thanks to the mDNS protocol
 your device should be able to resolve your hostname to the actual IP address of your Mac and make the connection.
+
+> Tip: Do not forget to also update the `issuerRequestUri` field in the service configuration.
 
 ## Topics
 

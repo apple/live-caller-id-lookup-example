@@ -12,7 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#if canImport(Darwin)
 import Foundation
+#else
+// Foundation.URL is not Sendable
+@preconcurrency import Foundation
+#endif
 import Hummingbird
 import PrivacyPass
 
@@ -43,8 +48,11 @@ struct PrivacyPassController<UserAuthenticator: UserTokenAuthenticator> {
                 tokenKeyBase64Url: spki.base64URLEncodedString(),
                 notBefore: nil)
         }
-        // swiftlint:disable:next force_unwrapping
-        return TokenIssuerDirectory(issuerRequestUri: URL(string: "/issue")!, tokenKeys: tokenKeys)
+        #if canImport(Darwin)
+        return TokenIssuerDirectory(issuerRequestUri: state.issuerRequestUri, tokenKeys: tokenKeys)
+        #else
+        return await TokenIssuerDirectory(issuerRequestUri: state.issuerRequestUri, tokenKeys: tokenKeys)
+        #endif
     }
 
     @Sendable
