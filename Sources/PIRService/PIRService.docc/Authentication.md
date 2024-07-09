@@ -1,6 +1,6 @@
-# Authentication
+# Anonymous Authentication
 
-Learn how request authentication works
+Learn how request authentication works.
 
 ## Overview
 
