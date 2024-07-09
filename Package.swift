@@ -38,7 +38,7 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-asn1.git", .upToNextMajor(from: "1.0.0")),
         .package(url: "https://github.com/apple/swift-crypto.git", from: "3.5.0"),
         .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.0.0"),
-        .package(url: "https://github.com/apple/swift-protobuf.git", from: "1.6.0"),
+        .package(url: "https://github.com/apple/swift-protobuf.git", from: "1.27.0"),
         .package(url: "https://github.com/hummingbird-project/hummingbird", exact: "2.0.0-beta.8"),
     ],
     targets: [

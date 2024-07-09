@@ -43,7 +43,7 @@ struct PIRServiceController {
             }
 
             let key = Self.persistKey(user: context.userIdentifier, configHash: evaluationKey.metadata.identifier)
-            try await evaluationKeyStore.set(key: key, value: evaluationKey.serializedData())
+            try await evaluationKeyStore.set(key: key, value: Protobuf(evaluationKey))
         }
         return .init(status: .ok)
     }
@@ -70,9 +70,9 @@ struct PIRServiceController {
             let key = Self.persistKey(user: context.userIdentifier, configHash: keyConfigHash)
             let storedEvaluationKey = try await evaluationKeyStore.get(
                 key: key,
-                as: Data.self).map { try Apple_SwiftHomomorphicEncryption_Api_V1_EvaluationKey(serializedData: $0) }
+                as: Protobuf<Apple_SwiftHomomorphicEncryption_Api_V1_EvaluationKey>.self)
             return Apple_SwiftHomomorphicEncryption_Api_V1_KeyStatus.with { keyStatus in
-                keyStatus.timestamp = storedEvaluationKey?.metadata.timestamp ?? 0
+                keyStatus.timestamp = storedEvaluationKey?.message.metadata.timestamp ?? 0
                 keyStatus.keyConfig = keyConfig
             }
         }
@@ -107,7 +107,7 @@ struct PIRServiceController {
                     configHash: evaluationKeyConfigHash)
                 evaluationKey = try await evaluationKeyStore.get(
                     key: evaluationKeyStoreKey,
-                    as: Data.self).map { try Apple_SwiftHomomorphicEncryption_Api_V1_EvaluationKey(serializedData: $0) }
+                    as: Protobuf<Apple_SwiftHomomorphicEncryption_Api_V1_EvaluationKey>.self)?.message
             }
 
             guard let evaluationKey else {

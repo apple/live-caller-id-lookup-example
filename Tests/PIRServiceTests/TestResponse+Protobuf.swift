@@ -18,7 +18,6 @@ import SwiftProtobuf
 
 extension TestResponse {
     func message<Msg: Message>(as _: Msg.Type) throws -> Msg {
-        let serialized = Data(buffer: body, byteTransferStrategy: .noCopy)
-        return try Msg(serializedData: serialized)
+        try Msg(serializedBytes: Array(buffer: body))
     }
 }

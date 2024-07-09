@@ -83,8 +83,8 @@ class PIRServiceControllerTests: XCTestCase {
             let persistKey = PIRServiceController.persistKey(user: user, configHash: evalKeyMetadata.identifier)
             let storedKey = try await evaluationKeyStore.get(
                 key: persistKey,
-                as: Data.self).map { try Apple_SwiftHomomorphicEncryption_Api_V1_EvaluationKey(serializedData: $0) }
-            XCTAssertEqual(storedKey, evalKey)
+                as: Protobuf<Apple_SwiftHomomorphicEncryption_Api_V1_EvaluationKey>.self)
+            XCTAssertEqual(storedKey?.message, evalKey)
         }
     }
 

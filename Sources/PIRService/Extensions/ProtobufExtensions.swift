@@ -19,7 +19,7 @@ import Hummingbird
 import SwiftProtobuf
 
 /// Wrapper class for protobuf messages
-struct Protobuf<Msg: Message>: ResponseGenerator {
+struct Protobuf<Msg: Message>: Sendable, ResponseGenerator {
     let message: Msg
 
     init(_ message: Msg) {
@@ -32,6 +32,18 @@ struct Protobuf<Msg: Message>: ResponseGenerator {
         let serialized = try message.serializedData()
         let buffer = context.allocator.buffer(data: serialized)
         return Response(status: .ok, body: ResponseBody(byteBuffer: buffer))
+    }
+}
+
+extension Protobuf: Codable {
+    init(from decoder: any Swift.Decoder) throws {
+        let serialized = try decoder.singleValueContainer().decode(Data.self)
+        self.message = try Msg(serializedBytes: serialized)
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(message.serializedData())
     }
 }
 

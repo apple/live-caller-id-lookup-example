@@ -19,6 +19,6 @@ import SwiftProtobuf
 extension Request {
     func decodeProto<Msg: Message>(as _: Msg.Type, context: some RequestContext) async throws -> Msg {
         let body = try await body.collect(upTo: context.maxUploadSize)
-        return try Msg(serializedData: Data(buffer: body, byteTransferStrategy: .noCopy))
+        return try Msg(serializedBytes: Array(buffer: body))
     }
 }

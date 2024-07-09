@@ -35,7 +35,7 @@ fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAP
 }
 
 /// Image format.
-enum ImageFormat: SwiftProtobuf.Enum {
+enum ImageFormat: SwiftProtobuf.Enum, Swift.CaseIterable {
   typealias RawValue = Int
 
   /// Unspecified format.
@@ -65,24 +65,18 @@ enum ImageFormat: SwiftProtobuf.Enum {
     }
   }
 
-}
-
-#if swift(>=4.2)
-
-extension ImageFormat: CaseIterable {
   // The compiler won't synthesize support with the UNRECOGNIZED case.
   static let allCases: [ImageFormat] = [
     .unspecified,
     .heic,
   ]
-}
 
-#endif  // swift(>=4.2)
+}
 
 /// Identity Category.
 ///
 /// The system might show identity information differently based on the category.
-enum IdentityCategory: SwiftProtobuf.Enum {
+enum IdentityCategory: SwiftProtobuf.Enum, Swift.CaseIterable {
   typealias RawValue = Int
 
   /// Unspecified category.
@@ -117,23 +111,17 @@ enum IdentityCategory: SwiftProtobuf.Enum {
     }
   }
 
-}
-
-#if swift(>=4.2)
-
-extension IdentityCategory: CaseIterable {
   // The compiler won't synthesize support with the UNRECOGNIZED case.
   static let allCases: [IdentityCategory] = [
     .unspecified,
     .person,
     .business,
   ]
+
 }
 
-#endif  // swift(>=4.2)
-
 /// Icon
-struct Icon {
+struct Icon: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -150,7 +138,7 @@ struct Icon {
 }
 
 /// Caller Identity
-struct CallIdentity {
+struct CallIdentity: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -182,13 +170,6 @@ struct CallIdentity {
 
   fileprivate var _icon: Icon? = nil
 }
-
-#if swift(>=5.5) && canImport(_Concurrency)
-extension ImageFormat: @unchecked Sendable {}
-extension IdentityCategory: @unchecked Sendable {}
-extension Icon: @unchecked Sendable {}
-extension CallIdentity: @unchecked Sendable {}
-#endif  // swift(>=5.5) && canImport(_Concurrency)
 
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 

@@ -34,7 +34,7 @@ fileprivate struct _GeneratedWithProtocGenSwiftVersion: SwiftProtobuf.ProtobufAP
   typealias Version = _2
 }
 
-struct InputCallIdentity {
+struct InputCallIdentity: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -55,7 +55,7 @@ struct InputCallIdentity {
   init() {}
 }
 
-struct InputIdentities {
+struct InputIdentities: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
@@ -66,11 +66,6 @@ struct InputIdentities {
 
   init() {}
 }
-
-#if swift(>=5.5) && canImport(_Concurrency)
-extension InputCallIdentity: @unchecked Sendable {}
-extension InputIdentities: @unchecked Sendable {}
-#endif  // swift(>=5.5) && canImport(_Concurrency)
 
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
