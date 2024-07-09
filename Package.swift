@@ -71,7 +71,8 @@ let package = Package(
                 // when moving to proper package url
                 .product(name: "PrivateInformationRetrievalProtobuf", package: "swift-he"),
                 .product(name: "SwiftProtobuf", package: "swift-protobuf"),
-            ]),
+            ],
+            exclude: ["protobuf"]),
         .target(
             name: "PrivacyPass",
             dependencies: [
