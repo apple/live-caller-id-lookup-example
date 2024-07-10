@@ -46,13 +46,21 @@ class PIRServiceControllerTests: XCTestCase {
     }
 
     func testNoUserIdentifier() async throws {
+        // Error message returned by Hummingbird
+        struct ErrorMessage: Codable {
+            // swiftlint:disable:next nesting
+            struct Details: Codable {
+                let message: String
+            }
+
+            let error: Details
+        }
+
         let app = try await buildApplication()
         try await app.test(.live) { client in
             try await client.execute(uri: "/key", method: .post) { response in
-                let expectedErrror = HTTPError(.badRequest, message: "Missing 'User-Identifier' header")
-                XCTAssertEqual(response.status, expectedErrror.status)
-                let expectedBody = expectedErrror.body(allocator: ByteBufferAllocator())
-                XCTAssertEqual(response.body, expectedBody)
+                let errorMessage = try JSONDecoder().decode(ErrorMessage.self, from: response.body)
+                XCTAssertEqual(errorMessage.error.message, "Missing 'User-Identifier' header")
             }
         }
     }

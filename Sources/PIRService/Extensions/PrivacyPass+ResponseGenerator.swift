@@ -33,12 +33,9 @@ extension PrivacyPass.PrivacyPassError: @retroactive HTTPResponseError {
         }
     }
 
-    public var headers: HTTPTypes.HTTPFields {
-        [:]
-    }
-
-    public func body(allocator: NIOCore.ByteBufferAllocator) -> NIOCore.ByteBuffer? {
-        allocator.buffer(string: localizedDescription)
+    public func response(from _: Request, context: some RequestContext) throws -> Response {
+        let body = context.allocator.buffer(string: localizedDescription)
+        return Response(status: status, body: ResponseBody(byteBuffer: body))
     }
 }
 

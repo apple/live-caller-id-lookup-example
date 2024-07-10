@@ -21,12 +21,9 @@ extension HomomorphicEncryption.HeError: @retroactive HTTPResponseError {
         .badRequest
     }
 
-    public var headers: HTTPFields {
-        .init()
-    }
-
-    public func body(allocator: NIOCore.ByteBufferAllocator) -> NIOCore.ByteBuffer? {
-        allocator.buffer(string: localizedDescription)
+    public func response(from _: Request, context: some RequestContext) throws -> Response {
+        let body = context.allocator.buffer(string: localizedDescription)
+        return Response(status: status, body: ResponseBody(byteBuffer: body))
     }
 }
 
@@ -35,11 +32,8 @@ extension PrivateInformationRetrieval.PirError: @retroactive HTTPResponseError {
         .badRequest
     }
 
-    public var headers: HTTPFields {
-        .init()
-    }
-
-    public func body(allocator: NIOCore.ByteBufferAllocator) -> ByteBuffer? {
-        allocator.buffer(string: localizedDescription)
+    public func response(from _: Request, context: some RequestContext) throws -> Response {
+        let body = context.allocator.buffer(string: localizedDescription)
+        return Response(status: status, body: ResponseBody(byteBuffer: body))
     }
 }
