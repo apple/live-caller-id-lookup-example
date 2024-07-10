@@ -141,7 +141,7 @@ done faster. For this we  will use the `PIRProcessDatabase` utility.
 
 > Important: These example configurations are just for example. Please see
 > [Keyword PIR Parameter
-> Tuning](https://github.com/apple/swift-homomorphic-encryption/Sources/PrivateInformationRetrieval/PrivateInformationRetrieval.docc/ParameterTuning.md)
+> Tuning](https://github.com/apple/swift-homomorphic-encryption/blob/578a38e1f7b2e4a4da26b93060ae31b89a4ea5e7/Sources/PrivateInformationRetrieval/PrivateInformationRetrieval.docc/ParameterTuning.md)
 > to learn how to adjust the configuration for your dataset.
 
 Write the following configuration into a file called `block-config.json`.
