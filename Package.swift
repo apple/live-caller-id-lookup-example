@@ -35,7 +35,7 @@ let package = Package(
             url: "git@github.pie.apple.com:SIMLCryptoAndPrivacy/swift-he.git",
             revision: "508f0fe02676986e59c64ce1a2624107ff54f870"),
         .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.2.0"),
-        .package(url: "https://github.com/apple/swift-asn1.git", .upToNextMajor(from: "1.0.0")),
+        .package(url: "https://github.com/apple/swift-asn1.git", from: "1.0.0"),
         .package(url: "https://github.com/apple/swift-crypto.git", from: "3.5.0"),
         .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.0.0"),
         .package(url: "https://github.com/apple/swift-protobuf.git", from: "1.27.0"),
