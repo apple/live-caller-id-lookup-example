@@ -36,7 +36,7 @@ let package = Package(
         .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.0.0"),
         .package(
             url: "https://github.com/apple/swift-homomorphic-encryption",
-            revision: "578a38e1f7b2e4a4da26b93060ae31b89a4ea5e7"),
+            revision: "a5691b2b1b5ed0d59d45828143361de648b96572"),
         .package(url: "https://github.com/apple/swift-protobuf.git", from: "1.27.0"),
         .package(url: "https://github.com/hummingbird-project/hummingbird", exact: "2.0.0-rc.2"),
     ],
