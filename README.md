@@ -28,10 +28,10 @@ Additionally, developing Live Caller ID Lookup Example requires:
 * [swiftlint](https://github.com/realm/SwiftLint)
 
 ### Building
-You can build Live Caller ID Lookup Example either via XCode or via command line in a terminal.
-#### XCode
-To build Live Caller ID Lookup Example from XCode, simply open the root directory (i.e., the `live-caller-id-lookup-example` directory) of the repository in XCode.
-See the [XCode documentation](https://developer.apple.com/documentation/xcode) for more details on developing with XCode.
+You can build Live Caller ID Lookup Example either via Xcode or via command line in a terminal.
+#### Xcode
+To build Live Caller ID Lookup Example from Xcode, simply open the root directory (i.e., the `live-caller-id-lookup-example` directory) of the repository in Xcode.
+See the [Xcode documentation](https://developer.apple.com/documentation/xcode) for more details on developing with Xcode.
 
 #### Command line
 To build Live Caller ID Lookup Example from command line, open the root directory (i.e., the `live-caller-id-lookup-example` directory) of the repository in a terminal, and run
@@ -66,8 +66,8 @@ If you would like to make a pull request to Live Caller ID Lookup Example, pleas
 # Documentation
 Live Caller ID Lookup Example uses DocC for documentation.
 For more information, refer to [the DocC documentation](https://www.swift.org/documentation/docc) and the [Swift-DocC Plugin](https://swiftlang.github.io/swift-docc-plugin/documentation/swiftdoccplugin).
-## XCode
-The documentation can be built from XCode via `Product -> Build Documentation`.
+## Xcode
+The documentation can be built from Xcode via `Product -> Build Documentation`.
 ## Command line
 The documentation can be built from command line by running
 ```sh
