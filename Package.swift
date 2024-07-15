@@ -1,4 +1,4 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 5.10
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 // Copyright 2024 Apple Inc. and the Swift Homomorphic Encryption project authors
@@ -18,6 +18,7 @@
 import PackageDescription
 
 let swiftSettings: [SwiftSetting] = [
+    .enableExperimentalFeature("StrictConcurrency"),
     .unsafeFlags(["-cross-module-optimization"], .when(configuration: .release)),
 ]
 
@@ -33,7 +34,7 @@ let package = Package(
         // TODO: need to switch to a repository URL & a version number
         .package(
             url: "git@github.pie.apple.com:SIMLCryptoAndPrivacy/swift-he.git",
-            revision: "508f0fe02676986e59c64ce1a2624107ff54f870"),
+            revision: "4217ed78380ee8f967a46cce4db7fde2436ff147"),
         .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.2.0"),
         .package(url: "https://github.com/apple/swift-asn1.git", from: "1.0.0"),
         .package(url: "https://github.com/apple/swift-crypto.git", from: "3.5.0"),
@@ -72,14 +73,16 @@ let package = Package(
                 .product(name: "PrivateInformationRetrievalProtobuf", package: "swift-he"),
                 .product(name: "SwiftProtobuf", package: "swift-protobuf"),
             ],
-            exclude: ["protobuf"]),
+            exclude: ["protobuf"],
+            swiftSettings: swiftSettings),
         .target(
             name: "PrivacyPass",
             dependencies: [
                 .product(name: "Crypto", package: "swift-crypto"),
-                .product(name: "_CryptoExtras", package: "swift-crypto"),
                 .product(name: "SwiftASN1", package: "swift-asn1"),
-            ]),
+                .product(name: "_CryptoExtras", package: "swift-crypto"),
+            ],
+            swiftSettings: swiftSettings),
         .testTarget(
             name: "PrivacyPassTests",
             dependencies: [
@@ -87,5 +90,6 @@ let package = Package(
                 .product(name: "_CryptoExtras", package: "swift-crypto"),
                 .byName(name: "PrivacyPass"),
             ],
-            exclude: ["TestVectors/PrivacyPassPublicTokens.json"]),
+            exclude: ["TestVectors/PrivacyPassPublicTokens.json"],
+            swiftSettings: swiftSettings),
     ])

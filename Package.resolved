@@ -1,5 +1,5 @@
 {
-  "originHash" : "5c1745d3a1e2ff4f897d2dd51d4a324978f5fd53061da133903c522dd9e7016a",
+  "originHash" : "f53972be98da21a9c78b409a1077fe6f08528d5f53de5b13d4bb86134b9fde89",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -114,7 +114,7 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.pie.apple.com:SIMLCryptoAndPrivacy/swift-he.git",
       "state" : {
-        "revision" : "508f0fe02676986e59c64ce1a2624107ff54f870"
+        "revision" : "4217ed78380ee8f967a46cce4db7fde2436ff147"
       }
     },
     {
