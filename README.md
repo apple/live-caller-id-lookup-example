@@ -20,7 +20,7 @@ Live caller ID Lookup Example provides:
 Building Live Caller ID Lookup Example requires:
 * 64-bit processor with little-endian memory representation
 * macOS or Linux operating system
-* [Swift](https://www.swift.org/) version 6.0 or later
+* [Swift](https://www.swift.org/) version 5.10 or later
 
 Additionally, developing Live Caller ID Lookup Example requires:
 * [Nick Lockwood swiftformat](https://github.com/nicklockwood/SwiftFormat)
