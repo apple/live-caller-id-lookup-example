@@ -15,7 +15,7 @@
 import Hummingbird
 import PrivacyPass
 
-extension PrivacyPass.PrivacyPassError: @retroactive HTTPResponseError {
+extension PrivacyPass.PrivacyPassError: Hummingbird.HTTPResponseError {
     public var status: HTTPTypes.HTTPResponse.Status {
         // Default to `.badRequest` however, some erros types are specified to return HTTP 422.
         // From: https://www.rfc-editor.org/rfc/rfc9578#name-issuer-to-client-response-2
@@ -39,13 +39,13 @@ extension PrivacyPass.PrivacyPassError: @retroactive HTTPResponseError {
     }
 }
 
-extension TokenIssuerDirectory: @retroactive ResponseGenerator {
+extension TokenIssuerDirectory: Hummingbird.ResponseGenerator {
     public func response(from request: HummingbirdCore.Request, context: some RequestContext) throws -> Response {
         try context.responseEncoder.encode(self, from: request, context: context)
     }
 }
 
-extension PrivacyPass.TokenResponse: @retroactive ResponseGenerator {
+extension PrivacyPass.TokenResponse: Hummingbird.ResponseGenerator {
     public func response(from _: HummingbirdCore.Request, context: some RequestContext) throws -> Response {
         let body = context.allocator.buffer(bytes: bytes())
         return Response(
@@ -55,7 +55,7 @@ extension PrivacyPass.TokenResponse: @retroactive ResponseGenerator {
     }
 }
 
-extension PrivacyPass.PublicKey: @retroactive ResponseGenerator {
+extension PrivacyPass.PublicKey: Hummingbird.ResponseGenerator {
     public func response(from _: Request, context: some RequestContext) throws -> Response {
         let body = try context.allocator.buffer(bytes: spki())
         return Response(status: .ok, body: .init(byteBuffer: body))

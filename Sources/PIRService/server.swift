@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import ArgumentParser
-import Foundation
+@preconcurrency import Foundation
 import Hummingbird
 
 struct ServerConfiguration: Codable {
