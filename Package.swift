@@ -23,7 +23,7 @@ let swiftSettings: [SwiftSetting] = [
 ]
 
 let package = Package(
-    name: "pir-service",
+    name: "live-caller-id-lookup-example",
     platforms: [.macOS(.v14)],
     products: [
         .executable(name: "PIRService", targets: ["PIRService"]),

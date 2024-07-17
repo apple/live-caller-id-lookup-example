@@ -132,16 +132,19 @@ ConstructDatabase --icon-directory icons input.txtpb block.binpb identity.binpb
 
 This creates the `block.binpb` and `identity.binpb` files which are the blocking dataset and the identity dataset
 expected for Live Caller ID Lookup. Both of these are in binary protobuf format, that is accepted by the
-`PIRProcessDatabase` utility.
+[PIRProcessDatabase](https://swiftpackageindex.com/apple/swift-homomorphic-encryption/main/documentation/pirprocessdatabase)
+utility.
 
 ## Processing the datasets
 
 Before setting up a server to host these two datasets we need to process them a bit, so the online PIR queries can be
-done faster. For this we  will use the `PIRProcessDatabase` utility.
+done faster. For this we will use the
+[PIRProcessDatabase](https://swiftpackageindex.com/apple/swift-homomorphic-encryption/main/documentation/pirprocessdatabase)
+utility.
 
 > Important: These example configurations are just for example. Please see
-> [Keyword PIR Parameter
-> Tuning](https://github.com/apple/swift-homomorphic-encryption/blob/578a38e1f7b2e4a4da26b93060ae31b89a4ea5e7/Sources/PrivateInformationRetrieval/PrivateInformationRetrieval.docc/ParameterTuning.md)
+> [Parameter
+> Tuning](https://swiftpackageindex.com/apple/swift-homomorphic-encryption/main/documentation/privateinformationretrieval/parametertuning)
 > to learn how to adjust the configuration for your dataset.
 
 Write the following configuration into a file called `block-config.json`.
