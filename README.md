@@ -6,6 +6,11 @@ is a new feature that allows the system to communicate with a third party servic
 about a phone number when an incoming call is coming in. This allows the system to automatically block known spam
 callers and display identity information on the incoming call screen.
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./Sources/PIRService/PIRService.docc/Resources/overview~dark@2x.png">
+  <img alt="Overview of the Live Caller ID Lookup" src="./Sources/PIRService/PIRService.docc/Resources/overview@2x.png">
+</picture>
+
 This repository provides a functional server backend to test the Live Caller ID Lookup feature.
 
 > [!WARNING]
