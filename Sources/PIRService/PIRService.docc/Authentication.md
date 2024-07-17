@@ -11,7 +11,7 @@ different level of details can be provided based on the user tier.
 
 ### Authentication flow
 
-![Authentication flow diagram](authentication.svg)
+![Authentication flow diagram](authentication.png)
 
 1. Authentication server shares the public keys with PIR compute nodes. (Optional)
 2. Application autenticates with the authentication server using regular authentication flow.
