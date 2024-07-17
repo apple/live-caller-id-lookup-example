@@ -23,6 +23,8 @@ HTTP](https://www.rfc-editor.org/rfc/rfc9458)(OHTTP). In OHTTP, the client will 
 of a gateway. It then sends the encrypted request to a relay that removes the client's IP address before forwarding it
 to the gateway. The gateway decrypts the request and sends it to the target resource.
 
+![Oblivious HTTP flow diagram](oblivious-http.png)
+
 Apple will provide the relay for all users of Live Caller ID Lookup. This means that third party gateways and services
 are not able to see client IP addresses. At the same time, Apple's relays do not learn the specifics of the requests.
 
