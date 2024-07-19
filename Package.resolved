@@ -1,5 +1,5 @@
 {
-  "originHash" : "c762e18aafbd295a2dcbb0271cd6db207f5fc83b05807ba78e8c0a784449cbd0",
+  "originHash" : "632642473281828e4728c818305e4547a77da11f1d32867ced1766ff5e7650de",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -114,8 +114,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-homomorphic-encryption",
       "state" : {
-        "revision" : "2e0f602d6ef9c412eb76534b0265268e37f377f8",
-        "version" : "1.0.0-alpha.2"
+        "revision" : "8a67b7bc1f659fb5434cda881e3a0bdc9c6f136a",
+        "version" : "1.0.0-alpha.3"
       }
     },
     {
