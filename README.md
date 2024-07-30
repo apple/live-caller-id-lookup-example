@@ -7,8 +7,8 @@ about a phone number when an incoming call is coming in. This allows the system 
 callers and display identity information on the incoming call screen.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./Sources/PIRService/PIRService.docc/Resources/overview~dark@2x.png">
-  <img alt="Overview of the Live Caller ID Lookup" src="./Sources/PIRService/PIRService.docc/Resources/overview@2x.png">
+  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/apple/live-caller-id-lookup-example/raw/main/Sources/PIRService/PIRService.docc/Resources/overview~dark@2x.png">
+  <img alt="Overview of the Live Caller ID Lookup" src="https://github.com/apple/live-caller-id-lookup-example/raw/main/Sources/PIRService/PIRService.docc/Resources/overview@2x.png">
 </picture>
 
 This repository provides a functional server backend to test the Live Caller ID Lookup feature.
