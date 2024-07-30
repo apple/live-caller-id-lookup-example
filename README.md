@@ -21,6 +21,8 @@ Live caller ID Lookup Example provides:
 * [PIRService](https://swiftpackageindex.com/apple/live-caller-id-lookup-example/main/documentation/pirservice), an example service for Live Caller ID Lookup.
 * [PrivacyPass](https://swiftpackageindex.com/apple/live-caller-id-lookup-example/main/documentation/privacypass), an implementation of the Privacy Pass publicly verifiable tokens.
 
+The documentation lives at [Swift Package Index](https://swiftpackageindex.com/apple/live-caller-id-lookup-example).
+
 ## Developing Live Caller ID Lookup Example
 Building Live Caller ID Lookup Example requires:
 * 64-bit processor with little-endian memory representation
@@ -68,12 +70,12 @@ swift test --parallel
 ### Contributing
 If you would like to make a pull request to Live Caller ID Lookup Example, please run `pre-commit install`. Then each commit will run some basic formatting checks.
 
-# Documentation
+### Documentation
 Live Caller ID Lookup Example uses DocC for documentation.
 For more information, refer to [the DocC documentation](https://www.swift.org/documentation/docc) and the [Swift-DocC Plugin](https://swiftlang.github.io/swift-docc-plugin/documentation/swiftdoccplugin).
-## Xcode
+#### Xcode
 The documentation can be built from Xcode via `Product -> Build Documentation`.
-## Command line
+#### Command line
 The documentation can be built from command line by running
 ```sh
 swift package generate-documentation
