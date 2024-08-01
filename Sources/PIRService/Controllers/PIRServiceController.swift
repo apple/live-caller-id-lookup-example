@@ -57,7 +57,7 @@ struct PIRServiceController {
             as: Apple_SwiftHomomorphicEncryption_Api_Pir_V1_ConfigRequest.self,
             context: context)
         let requestedUsecases = if configRequest.usecases.isEmpty {
-            await usecases.store
+            await usecases.getAll()
         } else {
             await usecases.get(names: configRequest.usecases)
         }
@@ -117,7 +117,16 @@ struct PIRServiceController {
                 throw HTTPError(.badRequest, message: "Evaluation key not found")
             }
 
-            guard let usecase = await usecases.get(name: request.usecase) else {
+            let configId = Array(request.pirRequest.configurationHash)
+            guard let usecase = await usecases.get(
+                name: request.usecase,
+                configId: configId)
+            else {
+                if await (usecases.get(name: request.usecase)) != nil {
+                    throw HTTPError(
+                        .gone,
+                        message: "Configuration id: \(configId) is no longer available for usecase \(request.usecase).")
+                }
                 throw HTTPError(.badRequest, message: "Unknown usecase: \(request.usecase)")
             }
             return try await usecase.process(request: request, evaluationKey: evaluationKey)

@@ -15,17 +15,7 @@
 import ArgumentParser
 import Foundation
 import Hummingbird
-
-struct ServerConfiguration: Codable {
-    struct Usecase: Codable {
-        let name: String
-        let fileStem: String
-        let shardCount: Int
-    }
-
-    let users: [UserTier: [String]]
-    let usecases: [Usecase]
-}
+import ServiceLifecycle
 
 @main
 struct ServerCommand: AsyncParsableCommand {
@@ -37,32 +27,23 @@ struct ServerCommand: AsyncParsableCommand {
     @Argument var configFile: String
 
     func run() async throws {
-        var privacyPassState: PrivacyPassState<UserAuthenticator>?
         let usecaseStore = UsecaseStore()
-
-        let configURL = URL(fileURLWithPath: configFile)
-        let configData = try Data(contentsOf: configURL)
-        let config = try JSONDecoder().decode(ServerConfiguration.self, from: configData)
-
-        if !config.users.isEmpty {
-            let authenticator = UserAuthenticator()
-            for (tier, users) in config.users {
-                for user in users {
-                    await authenticator.add(token: user, tier: tier)
-                }
-            }
-            privacyPassState = try .init(userAuthenticator: authenticator)
-        }
-
-        for usecase in config.usecases {
-            let loaded = try loadUsecase(from: usecase.fileStem, shardCount: usecase.shardCount)
-            await usecaseStore.set(name: usecase.name, usecase: loaded)
-        }
+        let privacyPassState = try PrivacyPassState(userAuthenticator: UserAuthenticator())
 
         let app = try await buildApplication(
             configuration: .init(address: .hostname(hostname, port: port)),
             usecaseStore: usecaseStore,
             privacyPassState: privacyPassState)
-        try await app.runService()
+
+        let reloadService = ReloadService(
+            configFile: URL(fileURLWithPath: configFile),
+            usecaseStore: usecaseStore,
+            privacyPassState: privacyPassState,
+            logger: app.logger)
+
+        try await reloadService.reloadConfiguration()
+
+        let serviceGroup = ServiceGroup(configuration: .init(services: [app, reloadService], logger: app.logger))
+        try await serviceGroup.run()
     }
 }

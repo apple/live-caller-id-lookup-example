@@ -21,7 +21,7 @@ import XCTest
 class PIRServiceTests: XCTestCase {
     func testRequest() async throws {
         let usecaseStore = UsecaseStore()
-        await usecaseStore.set(name: "test", usecase: ExampleUsecase.hundred)
+        try await usecaseStore.set(name: "test", usecase: ExampleUsecase.hundred)
         let app = try await buildApplication(usecaseStore: usecaseStore)
         try await app.test(.live) { client in
             var pirClient = PIRClient<MulPirClient<Bfv<UInt32>>>(connection: client)
@@ -32,7 +32,7 @@ class PIRServiceTests: XCTestCase {
 
     func testRequestWithPrivacyPass() async throws {
         let usecaseStore = UsecaseStore()
-        await usecaseStore.set(name: "test", usecase: ExampleUsecase.hundred)
+        try await usecaseStore.set(name: "test", usecase: ExampleUsecase.hundred)
         let userAuthenticator = UserAuthenticator()
         await userAuthenticator.add(token: "ABCD", tier: .tier1)
         let privacyPassState = try PrivacyPassState(userAuthenticator: userAuthenticator)
@@ -41,6 +41,74 @@ class PIRServiceTests: XCTestCase {
             var pirClient = PIRClient<MulPirClient<Bfv<UInt32>>>(connection: client, userToken: "ABCD")
             let result = try await pirClient.request(keyword: "23")
             XCTAssertEqual(result, "23")
+        }
+    }
+
+    func testRoutingToDifferentVersion() async throws {
+        let usecaseStore = UsecaseStore()
+        // make sure that the configs for these two are different
+        XCTAssertNotEqual(try ExampleUsecase.ten.config(), try ExampleUsecase.hundred.config())
+        try await usecaseStore.set(name: "test", usecase: ExampleUsecase.hundred)
+        let app = try await buildApplication(usecaseStore: usecaseStore)
+        try await app.test(.live) { client in
+            // make a request
+            var clientWithOldConfig = PIRClient<MulPirClient<Bfv<UInt32>>>(connection: client)
+            var result = try await clientWithOldConfig.request(keyword: "23")
+            XCTAssertEqual(result, "23")
+
+            // update the usecase to only have 10 keywords
+            try await usecaseStore.set(name: "test", usecase: ExampleUsecase.ten)
+
+            // new client will not get a result for keyword "23"
+            var newClient = PIRClient<MulPirClient<Bfv<UInt32>>>(connection: client)
+            result = try await newClient.request(keyword: "23")
+            XCTAssertNil(result)
+
+            // Request with the old configuration is correctly routed to the previous version.
+            result = try await clientWithOldConfig.request(keyword: "23")
+            XCTAssertEqual(result, "23")
+
+            // update the usecase again, this time dropping the previous version.
+            try await usecaseStore.set(name: "test", usecase: ExampleUsecase.ten, versionCount: 1)
+
+            // request with the old configuration now throws an error
+            do {
+                _ = try await clientWithOldConfig.request(keyword: "1")
+                XCTFail("The previous line should throw!")
+            } catch {}
+        }
+    }
+
+    func testAddingAndRemovingUserTokens() async throws {
+        let usecaseStore = UsecaseStore()
+        try await usecaseStore.set(name: "test", usecase: ExampleUsecase.hundred)
+        let userAuthenticator = UserAuthenticator()
+        let privacyPassState = try PrivacyPassState(userAuthenticator: userAuthenticator)
+        let app = try await buildApplication(usecaseStore: usecaseStore, privacyPassState: privacyPassState)
+        try await app.test(.live) { client in
+            var pirClient = PIRClient<MulPirClient<Bfv<UInt32>>>(connection: client, userToken: "ABCD")
+            do {
+                _ = try await pirClient.request(keyword: "23")
+                XCTFail("Previous line should throw!")
+            } catch {}
+
+            // after adding the user token, the request should succeed
+            await userAuthenticator.add(token: "ABCD", tier: .tier1)
+
+            _ = try await pirClient.request(keyword: "42")
+
+            // remove the user token
+            await userAuthenticator.update(allowList: [:])
+
+            // at least one more request should succeed because of cached tokens
+            _ = try await pirClient.request(keyword: "42")
+
+            do {
+                for _ in 0..<10 {
+                    _ = try await pirClient.request(keyword: "this should eventually fail when tokens run out")
+                }
+                XCTFail("Previous loop should fail")
+            } catch {}
         }
     }
 }

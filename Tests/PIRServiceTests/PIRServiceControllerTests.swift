@@ -76,7 +76,7 @@ class PIRServiceControllerTests: XCTestCase {
     func testConfigFetch() async throws {
         let usecaseStore = UsecaseStore()
         let exampleUsecase = ExampleUsecase.hundred
-        await usecaseStore.set(name: "test", usecase: exampleUsecase)
+        try await usecaseStore.set(name: "test", usecase: exampleUsecase)
         let app = try await buildApplication(usecaseStore: usecaseStore)
         let user = UserIdentifier()
 
@@ -134,7 +134,7 @@ class PIRServiceControllerTests: XCTestCase {
 
         let usecaseStore = UsecaseStore()
         let exampleUsecase = TestUseCaseWithLargeConfig()
-        await usecaseStore.set(name: "test", usecase: exampleUsecase)
+        try await usecaseStore.set(name: "test", usecase: exampleUsecase)
 
         let app = try await buildApplication(usecaseStore: usecaseStore)
         let user = UserIdentifier()
