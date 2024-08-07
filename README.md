@@ -30,9 +30,9 @@ Building Live Caller ID Lookup Example requires:
 * [Swift](https://www.swift.org/) version 5.10 or later
 
 Additionally, developing Live Caller ID Lookup Example requires:
-* [Nick Lockwood swiftformat](https://github.com/nicklockwood/SwiftFormat)
+* [Nick Lockwood SwiftFormat](https://github.com/nicklockwood/SwiftFormat)
 * [pre-commit](https://pre-commit.com)
-* [swiftlint](https://github.com/realm/SwiftLint)
+* [SwiftLint](https://github.com/realm/SwiftLint)
 
 ### Building
 You can build Live Caller ID Lookup Example either via Xcode or via command line in a terminal.
