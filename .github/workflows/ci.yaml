@@ -1,0 +1,94 @@
+# Copyright 2024 Apple Inc. and the Swift Homomorphic Encryption project authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: CI
+permissions:
+  contents: read
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+    types: [opened, reopened, synchronize, ready_for_review]
+# Pushing changes to PR stops currently-running CI
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  SWIFTLINT_VERSION: 0.56.1
+  SWIFTFORMAT_VERSION: 0.54.3
+jobs:
+  swift-tests:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        swift: [ "5.10", "swift-6.0-DEVELOPMENT-SNAPSHOT-2024-08-06-a" ]
+    name: swift ${{ matrix.swift }} tests
+    steps:
+    - uses: slashmo/install-swift@v0.4.0
+      with:
+        version: ${{ matrix.swift }}
+    - uses: actions/checkout@v4
+    - name: Run tests
+      run: swift test --configuration release --parallel
+  pre-commit:
+    timeout-minutes: 1
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install pre-commit
+      run: pip install pre-commit
+    - name: Pre-commit checks
+      # CI will commit to `main`
+      # swiftformat & swiftlint tested separately
+      run: >
+        SKIP=no-commit-to-branch,lockwood-swiftformat,swiftlint,check-doc-comments
+        pre-commit run --all-files
+  lint:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Cache SwiftLint
+      id: cache-swiftlint
+      uses: actions/cache@v4
+      with:
+        path: /tmp/swiftlint/SwiftLint/.build/release/swiftlint
+        key: ${{ runner.os }}-swiftlint-${{ env.SWIFTLINT_VERSION }}
+    - name: Install SwiftLint
+      if: steps.cache-swiftlint.outputs.cache-hit != 'true'
+      run: |
+        ci/install-swiftlint.sh
+    - name: Run SwiftLint
+      run: /tmp/swiftlint/SwiftLint/.build/release/swiftlint lint --strict .
+  lockwood-swiftformat:
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Cache SwiftFormat
+      id: cache-swiftformat
+      uses: actions/cache@v4
+      with:
+        path: /tmp/swiftformat/SwiftFormat/.build/release/swiftformat
+        key: ${{ runner.os }}-swiftformat-${{ env.SWIFTFORMAT_VERSION }}
+    - name: Install Lockwood SwiftFormat
+      if: steps.cache-swiftformat.outputs.cache-hit != 'true'
+      run: |
+        ci/install-lockwood-swiftformat.sh
+    - name: Run SwiftFormat
+      run: /tmp/swiftformat/SwiftFormat/.build/release/swiftformat --strict .

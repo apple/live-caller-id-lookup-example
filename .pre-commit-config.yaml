@@ -54,8 +54,8 @@ repos:
     hooks:
     # Note, this is https://github.com/nicklockwood/SwiftFormat, not
     # https://github.com/apple/swift-format
-    -   id: swiftformat
-        name: swiftformat
+    -   id: lockwood-swiftformat
+        name: lockwood-swiftformat
         entry: swiftformat
         language: system
         types: [swift]
