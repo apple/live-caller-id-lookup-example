@@ -34,13 +34,13 @@ let package = Package(
         // TODO: need to switch to a repository URL & a version number
         .package(
             url: "git@github.pie.apple.com:SIMLCryptoAndPrivacy/swift-he.git",
-            revision: "4217ed78380ee8f967a46cce4db7fde2436ff147"),
+            revision: "cf0f54e286f74e8b68589129bde471dd878986a7"), // main branch on Aug 8, 2024
         .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.2.0"),
         .package(url: "https://github.com/apple/swift-asn1.git", from: "1.0.0"),
         .package(url: "https://github.com/apple/swift-crypto.git", from: "3.5.0"),
         .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.0.0"),
         .package(url: "https://github.com/apple/swift-protobuf.git", from: "1.27.0"),
-        .package(url: "https://github.com/hummingbird-project/hummingbird", exact: "2.0.0-rc.2"),
+        .package(url: "https://github.com/hummingbird-project/hummingbird", exact: "2.0.0-rc.3"),
     ],
     targets: [
         .executableTarget(

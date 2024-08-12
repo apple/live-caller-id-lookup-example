@@ -36,7 +36,7 @@ class PIRServiceControllerTests: XCTestCase {
         let config = try KeywordPirConfig(
             dimensionCount: 2,
             cuckooTableConfig: .defaultKeywordPir(maxSerializedBucketSize: context.bytesPerPlaintext),
-            unevenDimensions: false)
+            unevenDimensions: false, keyCompression: .noCompression)
         let processed = try ServerType.process(
             database: databaseRows,
             config: config,
@@ -151,8 +151,10 @@ class PIRServiceControllerTests: XCTestCase {
                 dimensionCount: shardConfig.dimensions.count,
                 cuckooTableConfig: CuckooTableConfig
                     .defaultKeywordPir(maxSerializedBucketSize: context.bytesPerPlaintext),
-                unevenDimensions: false)
-            let pirParameter = shardConfig.native(batchSize: Int(config.batchSize))
+                unevenDimensions: false, keyCompression: .noCompression)
+            let pirParameter = shardConfig.native(
+                batchSize: Int(config.batchSize),
+                evaluationKeyConfig: evaluationKeyConfig.native())
             let keywordPirClient: KeywordPirClient<MulPirClient<Scheme>> = .init(
                 keywordParameter: keywordConfig.parameter,
                 pirParameter: pirParameter,
@@ -186,9 +188,9 @@ class PIRServiceControllerTests: XCTestCase {
 
             let query = try keywordPirClient.generateQuery(at: queryKeyword, using: secretKey)
 
-            let pirRequest = Apple_SwiftHomomorphicEncryption_Api_V1_PIRRequest.with { pirRequest in
+            let pirRequest = try Apple_SwiftHomomorphicEncryption_Api_V1_PIRRequest.with { pirRequest in
                 pirRequest.shardIndex = 0
-                pirRequest.query = query.proto()
+                pirRequest.query = try query.proto()
                 pirRequest.evaluationKeyMetadata = evalKeyMetadata
                 // TODO: fill other fields?
             }
