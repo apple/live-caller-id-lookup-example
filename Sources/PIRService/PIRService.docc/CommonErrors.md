@@ -53,6 +53,28 @@ The `issuerRequestUri` field in `service-config.json` should also contain `/issu
 `http://MacBook-Pro.local:8080/issue`. Also make sure that the user token in the extension matches one in the
 `service-config.json`.
 
+### Missing configuration
+
+**Error example**:
+
+```
+Error Domain=com.apple.CipherML Code=401 "Unable to request data by keywords batch: missing configuration"
+UserInfo={NSLocalizedDescription=Unable to request data by keywords batch: missing configuration,
+NSUnderlyingError=0x600002f4c6f0 {Error Domain=CipherML.CipherMLError Code=25 "missing configuration"
+UserInfo={NSLocalizedDescription=missing configuration}}}: missing configuration
+```
+
+**Reason:**
+Device issued a request to the configuration endpoint (`/config`), but did not find the configuration for the usecase it
+was looking for.
+
+**Workaround:**
+Double-check that the service has usecases configured the way the device expects them. Usecase names should be:
+* `<bundleIdentifier>.block`
+* `<bundleIdentifier>.identity`
+
+where `<bundleIdentifier>` is replaced with bundle identifier of your Live Caller ID Lookup extension.
+
 ### No token key found with key id
 
 **Error example**:
