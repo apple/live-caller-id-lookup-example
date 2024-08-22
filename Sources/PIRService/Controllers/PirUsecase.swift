@@ -64,8 +64,9 @@ struct PirUsecase<PirScheme: IndexPirServer>: Usecase {
             }
 
             let database = try ProcessedDatabase(from: databasePath, context: context)
-            let processed = ProcessedDatabaseWithParameters(
+            let processed = try ProcessedDatabaseWithParameters(
                 database: database,
+                algorithm: params.algorithm.native(),
                 evaluationKeyConfiguration: pirParams.evaluationKeyConfig.native(),
                 pirParameter: pirParams.native(),
                 keywordPirParameter: pirParams.keywordPirParams.native())
@@ -88,8 +89,8 @@ struct PirUsecase<PirScheme: IndexPirServer>: Usecase {
         let query: KeywordPirServer<PirScheme>.Query = try pirRequest.query.native(context: context)
         let evaluationKey: EvaluationKey<Scheme> = try evaluationKey.evaluationKey.native(context: context)
         let response = try shard.computeResponse(to: query, using: evaluationKey)
-        return Apple_SwiftHomomorphicEncryption_Api_V1_Response.with { apiResponse in
-            apiResponse.pirResponse = response.proto()
+        return try Apple_SwiftHomomorphicEncryption_Api_V1_Response.with { apiResponse in
+            apiResponse.pirResponse = try response.proto()
         }
     }
 
