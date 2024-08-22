@@ -35,7 +35,7 @@ struct PIRServiceController {
     @Sendable
     func key(_ request: Request, context: AppContext) async throws -> Response {
         let evaluationKeys = try await request.decodeProto(
-            as: Apple_SwiftHomomorphicEncryption_Api_V1_EvaluationKeys.self,
+            as: Apple_SwiftHomomorphicEncryption_Api_Shared_V1_EvaluationKeys.self,
             context: context)
         for evaluationKey in evaluationKeys.keys {
             guard evaluationKey.hasMetadata, evaluationKey.hasEvaluationKey else {
@@ -52,7 +52,7 @@ struct PIRServiceController {
     func config(_ request: Request, context: AppContext) async throws -> some ResponseGenerator {
         context.logger.info("Tier = \(context.userTier)")
         let configRequest = try await request.decodeProto(
-            as: Apple_SwiftHomomorphicEncryption_Api_V1_ConfigRequest.self,
+            as: Apple_SwiftHomomorphicEncryption_Api_Pir_V1_ConfigRequest.self,
             context: context)
         let requestedUsecases = if configRequest.usecases.isEmpty {
             await usecases.store
@@ -70,15 +70,16 @@ struct PIRServiceController {
             let key = Self.persistKey(user: context.userIdentifier, configHash: keyConfigHash)
             let storedEvaluationKey = try await evaluationKeyStore.get(
                 key: key,
-                as: Protobuf<Apple_SwiftHomomorphicEncryption_Api_V1_EvaluationKey>.self)
-            return Apple_SwiftHomomorphicEncryption_Api_V1_KeyStatus.with { keyStatus in
+                as: Protobuf<Apple_SwiftHomomorphicEncryption_Api_Shared_V1_EvaluationKey>.self)
+            return Apple_SwiftHomomorphicEncryption_Api_Shared_V1_KeyStatus.with { keyStatus in
                 keyStatus.timestamp = storedEvaluationKey?.message.metadata.timestamp ?? 0
                 keyStatus.keyConfig = keyConfig
             }
         }
 
-        let keyStatuses: [Apple_SwiftHomomorphicEncryption_Api_V1_KeyStatus] = try await .init(keyStatusesSequence)
-        return Protobuf(Apple_SwiftHomomorphicEncryption_Api_V1_ConfigResponse.with { configResponse in
+        let keyStatuses: [Apple_SwiftHomomorphicEncryption_Api_Shared_V1_KeyStatus] =
+            try await .init(keyStatusesSequence)
+        return Protobuf(Apple_SwiftHomomorphicEncryption_Api_Pir_V1_ConfigResponse.with { configResponse in
             configResponse.configs = configs
             configResponse.keyInfo = keyStatuses
         })
@@ -88,7 +89,7 @@ struct PIRServiceController {
     func queries(_ request: Request, context: AppContext) async throws -> some ResponseGenerator {
         let startTime = Date.now
         let requests = try await request.decodeProto(
-            as: Apple_SwiftHomomorphicEncryption_Api_V1_Requests.self,
+            as: Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Requests.self,
             context: context)
 
         defer {
@@ -97,7 +98,7 @@ struct PIRServiceController {
         }
 
         let responsesSequence = requests.requests.async.map { request in
-            var evaluationKey: Apple_SwiftHomomorphicEncryption_Api_V1_EvaluationKey?
+            var evaluationKey: Apple_SwiftHomomorphicEncryption_Api_Shared_V1_EvaluationKey?
             if request.pirRequest.hasEvaluationKey {
                 evaluationKey = request.pirRequest.evaluationKey
             } else {
@@ -107,7 +108,7 @@ struct PIRServiceController {
                     configHash: evaluationKeyConfigHash)
                 evaluationKey = try await evaluationKeyStore.get(
                     key: evaluationKeyStoreKey,
-                    as: Protobuf<Apple_SwiftHomomorphicEncryption_Api_V1_EvaluationKey>.self)?.message
+                    as: Protobuf<Apple_SwiftHomomorphicEncryption_Api_Shared_V1_EvaluationKey>.self)?.message
             }
 
             guard let evaluationKey else {
@@ -120,8 +121,8 @@ struct PIRServiceController {
             return try await usecase.process(request: request, evaluationKey: evaluationKey)
         }
 
-        let responses: [Apple_SwiftHomomorphicEncryption_Api_V1_Response] = try await .init(responsesSequence)
-        return Protobuf(Apple_SwiftHomomorphicEncryption_Api_V1_Responses.with { apiResponses in
+        let responses: [Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Response] = try await .init(responsesSequence)
+        return Protobuf(Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Responses.with { apiResponses in
             apiResponses.responses = responses
         })
     }

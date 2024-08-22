@@ -21,8 +21,8 @@ extension HomomorphicEncryption.HeError: Hummingbird.HTTPResponseError {
         .badRequest
     }
 
-    public func response(from _: Request, context: some RequestContext) throws -> Response {
-        let body = context.allocator.buffer(string: localizedDescription)
+    public func response(from _: Request, context _: some RequestContext) throws -> Response {
+        let body = ByteBuffer(string: localizedDescription)
         return Response(status: status, body: ResponseBody(byteBuffer: body))
     }
 }
@@ -32,8 +32,8 @@ extension PrivateInformationRetrieval.PirError: Hummingbird.HTTPResponseError {
         .badRequest
     }
 
-    public func response(from _: Request, context: some RequestContext) throws -> Response {
-        let body = context.allocator.buffer(string: localizedDescription)
+    public func response(from _: Request, context _: some RequestContext) throws -> Response {
+        let body = ByteBuffer(string: localizedDescription)
         return Response(status: status, body: ResponseBody(byteBuffer: body))
     }
 }

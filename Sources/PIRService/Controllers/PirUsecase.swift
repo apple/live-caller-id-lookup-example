@@ -66,8 +66,8 @@ struct PirUsecase<PirScheme: IndexPirServer>: Usecase {
             let database = try ProcessedDatabase(from: databasePath, context: context)
             let processed = try ProcessedDatabaseWithParameters(
                 database: database,
-                algorithm: params.algorithm.native(),
-                evaluationKeyConfiguration: pirParams.evaluationKeyConfig.native(),
+                algorithm: pirParams.algorithm.native(),
+                evaluationKeyConfig: pirParams.evaluationKeyConfig.native(),
                 pirParameter: pirParams.native(),
                 keywordPirParameter: pirParams.keywordPirParams.native())
             return try KeywordPirServer(context: context, processed: processed)
@@ -77,9 +77,9 @@ struct PirUsecase<PirScheme: IndexPirServer>: Usecase {
     @_specialize(where PirScheme == MulPirServer<Bfv<UInt32>>)
     @_specialize(where PirScheme == MulPirServer<Bfv<UInt64>>)
     func process(
-        request: Apple_SwiftHomomorphicEncryption_Api_V1_Request,
-        evaluationKey: Apple_SwiftHomomorphicEncryption_Api_V1_EvaluationKey) async throws
-        -> Apple_SwiftHomomorphicEncryption_Api_V1_Response
+        request: Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Request,
+        evaluationKey: Apple_SwiftHomomorphicEncryption_Api_Shared_V1_EvaluationKey) async throws
+        -> Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Response
     {
         let pirRequest = request.pirRequest
         guard !pirRequest.hasShardID else {
@@ -89,13 +89,13 @@ struct PirUsecase<PirScheme: IndexPirServer>: Usecase {
         let query: KeywordPirServer<PirScheme>.Query = try pirRequest.query.native(context: context)
         let evaluationKey: EvaluationKey<Scheme> = try evaluationKey.evaluationKey.native(context: context)
         let response = try shard.computeResponse(to: query, using: evaluationKey)
-        return try Apple_SwiftHomomorphicEncryption_Api_V1_Response.with { apiResponse in
+        return try Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Response.with { apiResponse in
             apiResponse.pirResponse = try response.proto()
         }
     }
 
-    func config() throws -> Apple_SwiftHomomorphicEncryption_Api_V1_Config {
-        var pirConfig = Apple_SwiftHomomorphicEncryption_Api_V1_PIRConfig()
+    func config() throws -> Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Config {
+        var pirConfig = Apple_SwiftHomomorphicEncryption_Api_Pir_V1_PIRConfig()
         pirConfig.encryptionParameters = try context.encryptionParameters.proto()
         pirConfig.shardConfigs = shards.map { shard in
             shard.indexPirParameter.proto()
@@ -104,10 +104,10 @@ struct PirUsecase<PirScheme: IndexPirServer>: Usecase {
         pirConfig.algorithm = .mulPir
         pirConfig.batchSize = UInt64(shards.first?.indexPirParameter.batchSize ?? 1)
         pirConfig.evaluationKeyConfigHash = try evaluationKeyConfig().sha256()
-        return Apple_SwiftHomomorphicEncryption_Api_V1_Config.with { $0.pirConfig = pirConfig }
+        return Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Config.with { $0.pirConfig = pirConfig }
     }
 
     func evaluationKeyConfig() throws -> Apple_SwiftHomomorphicEncryption_V1_EvaluationKeyConfig {
-        try shards.map(\.evaluationKeyConfiguration).union().proto(encryptionParameters: context.encryptionParameters)
+        try shards.map(\.evaluationKeyConfig).union().proto(encryptionParameters: context.encryptionParameters)
     }
 }

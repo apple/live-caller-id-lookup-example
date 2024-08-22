@@ -1,4 +1,4 @@
-// swift-tools-version: 5.10
+// swift-tools-version: 6.0
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 // Copyright 2024 Apple Inc. and the Swift Homomorphic Encryption project authors
@@ -18,13 +18,11 @@
 import PackageDescription
 
 let swiftSettings: [SwiftSetting] = [
-    .enableExperimentalFeature("StrictConcurrency"),
     .unsafeFlags(["-cross-module-optimization"], .when(configuration: .release)),
 ]
 
 let package = Package(
     name: "live-caller-id-lookup-example",
-    platforms: [.macOS(.v14)],
     products: [
         .executable(name: "PIRService", targets: ["PIRService"]),
         .executable(name: "ConstructDatabase", targets: ["ConstructDatabase"]),
@@ -34,10 +32,10 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.2.0"),
         .package(url: "https://github.com/apple/swift-asn1.git", from: "1.0.0"),
         .package(url: "https://github.com/apple/swift-crypto.git", from: "3.5.0"),
-        .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.0.0"),
-        .package(url: "https://github.com/apple/swift-homomorphic-encryption", exact: "1.0.0-beta.1"),
+        .package(url: "https://github.com/apple/swift-homomorphic-encryption", exact: "1.0.0-rc.1"),
         .package(url: "https://github.com/apple/swift-protobuf.git", from: "1.27.0"),
-        .package(url: "https://github.com/hummingbird-project/hummingbird", exact: "2.0.0-rc.2"),
+        .package(url: "https://github.com/hummingbird-project/hummingbird", from: "2.0.0"),
+        .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.0.0"),
     ],
     targets: [
         .executableTarget(
@@ -86,3 +84,10 @@ let package = Package(
             exclude: ["TestVectors/PrivacyPassPublicTokens.json"],
             swiftSettings: swiftSettings),
     ])
+
+#if canImport(Darwin)
+// Set the minimum macOS version for the package
+package.platforms = [
+    .macOS(.v15), // Constrained by Swift 6 support for Xcode (https://developer.apple.com/support/xcode/)
+]
+#endif
