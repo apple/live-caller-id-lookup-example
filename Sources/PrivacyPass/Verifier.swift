@@ -16,18 +16,24 @@ import _CryptoExtras
 import Foundation
 
 /// Token verifier.
-public struct Verifier: Sendable {
+public struct Verifier<NonceStore: NonceStoring>: Sendable {
     /// Public key used to verify tokens.
     public let publicKey: PublicKey
+
+    /// Nonce store to use to avoid double spending of tokens.
+    public let nonceStore: NonceStore
 
     /// Challenge digest to use for verification.
     public let challengeDigest: [UInt8]?
 
     /// Initialize a verifier.
-    /// - Parameter publicKey: Public key to use for verification.
-    /// - Parameter challengeDigest: Optional challenge digest.
-    public init(publicKey: PublicKey, challengeDigest: [UInt8]? = nil) {
+    /// - Parameters:
+    ///   - publicKey: Public key to use for verification.
+    ///   - nonceStore: Nonce store to use for storing nonces of redeemed tokens.
+    ///   - challengeDigest: Optional challenge digest.
+    public init(publicKey: PublicKey, nonceStore: NonceStore, challengeDigest: [UInt8]? = nil) {
         self.publicKey = publicKey
+        self.nonceStore = nonceStore
         self.challengeDigest = challengeDigest
     }
 
@@ -40,7 +46,7 @@ public struct Verifier: Sendable {
     /// - Parameter token: The token whose validity is being verified.
     /// - Returns: If the token is valid.
     /// - seealso: [RFC 9578: Token Verification](https://www.rfc-editor.org/rfc/rfc9578#name-token-verification-2)
-    public func verify(token: Token) throws -> Bool {
+    public func verify(token: Token) async throws -> Bool {
         // fast return, when token type or token key id are invalid
         guard token.tokenType == TokenTypeBlindRSA,
               token.tokenKeyId == publicKey.tokenKeyId
@@ -48,12 +54,18 @@ public struct Verifier: Sendable {
             return false
         }
 
-        // verify the challenege digest, if available
+        // verify the challenge digest, if available
         if let challengeDigest {
             guard token.challengeDigest == challengeDigest else {
                 return false
             }
         }
+
+        // verify that the nonce has not been redeemed already
+        guard try await !nonceStore.contains(nonce: token.nonce) else {
+            return false
+        }
+
         /*
          token_authenticator_input =
            concat(Token.token_type,
@@ -74,6 +86,10 @@ public struct Verifier: Sendable {
         inputMessage.append(contentsOf: token.tokenKeyId)
         let preparedMessage = publicKey.backing.prepare(inputMessage)
         let blindSignature = _RSA.Signing.RSASignature(rawRepresentation: token.authenticator)
-        return publicKey.backing.isValidSignature(blindSignature, for: preparedMessage)
+        let validToken = publicKey.backing.isValidSignature(blindSignature, for: preparedMessage)
+        if validToken {
+            try await nonceStore.store(nonce: token.nonce)
+        }
+        return validToken
     }
 }
