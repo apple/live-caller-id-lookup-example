@@ -21,7 +21,7 @@ protocol UserTokenAuthenticator: Sendable {
 
 actor PrivacyPassState<UserAuthenticator: UserTokenAuthenticator> {
     struct TieredVerifier {
-        let verifier: PrivacyPass.Verifier
+        let verifier: PrivacyPass.Verifier<InMemoryNonceStore>
         let tier: UserTier
     }
 
@@ -43,7 +43,7 @@ actor PrivacyPassState<UserAuthenticator: UserTokenAuthenticator> {
             } while verifiers[issuer.truncatedTokenKeyId] != nil
             issuers[tier] = issuer
             verifiers[issuer.truncatedTokenKeyId] = TieredVerifier(
-                verifier: PrivacyPass.Verifier(publicKey: issuer.publicKey),
+                verifier: PrivacyPass.Verifier(publicKey: issuer.publicKey, nonceStore: InMemoryNonceStore()),
                 tier: tier)
         }
 
