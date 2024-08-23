@@ -50,7 +50,7 @@ struct AuthenticateUserTierMiddleware<
             throw HTTPError(.unauthorized, message: "No token key found with key id: \(token.tokenKeyId)")
         }
 
-        guard try tieredVerifier.verifier.verify(token: token) else {
+        guard try await tieredVerifier.verifier.verify(token: token) else {
             throw HTTPError(.unauthorized, message: "Token did not pass verification")
         }
 
