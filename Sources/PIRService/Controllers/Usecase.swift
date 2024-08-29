@@ -16,10 +16,10 @@ import HomomorphicEncryptionProtobuf
 import PrivateInformationRetrievalProtobuf
 
 protocol Usecase: Sendable {
-    func config() throws -> Apple_SwiftHomomorphicEncryption_Api_V1_Config
+    func config() throws -> Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Config
     func evaluationKeyConfig() throws -> Apple_SwiftHomomorphicEncryption_V1_EvaluationKeyConfig
     func process(
-        request: Apple_SwiftHomomorphicEncryption_Api_V1_Request,
-        evaluationKey: Apple_SwiftHomomorphicEncryption_Api_V1_EvaluationKey) async throws
-        -> Apple_SwiftHomomorphicEncryption_Api_V1_Response
+        request: Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Request,
+        evaluationKey: Apple_SwiftHomomorphicEncryption_Api_Shared_V1_EvaluationKey) async throws
+        -> Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Response
 }

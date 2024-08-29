@@ -34,7 +34,7 @@ let package = Package(
         // TODO: need to switch to a repository URL & a version number
         .package(
             url: "git@github.pie.apple.com:SIMLCryptoAndPrivacy/swift-he.git",
-            revision: "cf0f54e286f74e8b68589129bde471dd878986a7"), // main branch on Aug 8, 2024
+            revision: "609b23635ee5bf7a6091483d7f475949178c01aa"), // main branch on Aug 28, 2024
         .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.2.0"),
         .package(url: "https://github.com/apple/swift-asn1.git", from: "1.0.0"),
         .package(url: "https://github.com/apple/swift-crypto.git", from: "3.5.0"),
