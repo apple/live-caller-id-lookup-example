@@ -1,5 +1,5 @@
 {
-  "originHash" : "045b3c155dae5cf2103354dc152190ed13a4d07fca1e659da3960070b42304c1",
+  "originHash" : "fb1d94d12080db2f957b3dd7860a353826d8a9b871ed65c83b2a6aa2d437cf0f",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/hummingbird-project/hummingbird",
       "state" : {
-        "revision" : "a1028d2b3c74fbf6f537abca6022d7c0d54a5d24",
-        "version" : "2.0.0-rc.3"
+        "revision" : "8927764e18295f50c6e75ecb35c51902eabe1ff1",
+        "version" : "2.0.0-rc.6"
       }
     },
     {
@@ -114,7 +114,6 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.pie.apple.com:SIMLCryptoAndPrivacy/swift-he.git",
       "state" : {
-        "branch" : "609b236",
         "revision" : "609b23635ee5bf7a6091483d7f475949178c01aa"
       }
     },
@@ -193,7 +192,7 @@
     {
       "identity" : "swift-numerics",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-numerics.git",
+      "location" : "https://github.com/apple/swift-numerics",
       "state" : {
         "revision" : "0a5bc04095a675662cf24757cc0640aa2204253b",
         "version" : "1.0.2"

@@ -27,10 +27,10 @@ struct Protobuf<Msg: Message>: Sendable, ResponseGenerator {
     }
 
     func response(from _: HummingbirdCore.Request,
-                  context: some RequestContext) throws -> Response
+                  context _: some RequestContext) throws -> Response
     {
         let serialized = try message.serializedData()
-        let buffer = context.allocator.buffer(data: serialized)
+        let buffer = ByteBuffer(data: serialized)
         return Response(status: .ok, body: ResponseBody(byteBuffer: buffer))
     }
 }
