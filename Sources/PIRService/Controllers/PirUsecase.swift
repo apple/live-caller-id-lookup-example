@@ -67,7 +67,7 @@ struct PirUsecase<PirScheme: IndexPirServer>: Usecase {
             let processed = try ProcessedDatabaseWithParameters(
                 database: database,
                 algorithm: pirParams.algorithm.native(),
-                evaluationKeyConfiguration: pirParams.evaluationKeyConfig.native(),
+                evaluationKeyConfig: pirParams.evaluationKeyConfig.native(),
                 pirParameter: pirParams.native(),
                 keywordPirParameter: pirParams.keywordPirParams.native())
             return try KeywordPirServer(context: context, processed: processed)
@@ -108,6 +108,6 @@ struct PirUsecase<PirScheme: IndexPirServer>: Usecase {
     }
 
     func evaluationKeyConfig() throws -> Apple_SwiftHomomorphicEncryption_V1_EvaluationKeyConfig {
-        try shards.map(\.evaluationKeyConfiguration).union().proto(encryptionParameters: context.encryptionParameters)
+        try shards.map(\.evaluationKeyConfig).union().proto(encryptionParameters: context.encryptionParameters)
     }
 }

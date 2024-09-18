@@ -83,7 +83,7 @@ struct ConstructDatabase: ParsableCommand {
     mutating func run() throws {
         let fm = FileManager.default
 
-        let input = try String(contentsOfFile: inputFile)
+        let input = try String(contentsOfFile: inputFile, encoding: .utf8)
         let inputIdentities = try InputIdentities(textFormatString: input)
 
         print("Loaded \(inputIdentities.identities.count) identities")

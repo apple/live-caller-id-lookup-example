@@ -29,16 +29,6 @@ pipelines:
     template: freestyle:v4:prb
     steps:
       - swift test --configuration release --parallel
-- group: test-5.10
-  machine:
-    baseImage: docker.apple.com/base-images/ubi9/swift5.10-builder
-  branchRules:
-    includePatterns:
-    - main
-  build:
-    template: freestyle:v4:prb
-    steps:
-      - swift test --configuration release --parallel
 - group: pre-commit
   branchRules:
     includePatterns:
