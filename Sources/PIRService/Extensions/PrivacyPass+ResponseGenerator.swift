@@ -33,8 +33,8 @@ extension PrivacyPass.PrivacyPassError: Hummingbird.HTTPResponseError {
         }
     }
 
-    public func response(from _: Request, context: some RequestContext) throws -> Response {
-        let body = context.allocator.buffer(string: localizedDescription)
+    public func response(from _: Request, context _: some RequestContext) throws -> Response {
+        let body = ByteBuffer(string: localizedDescription)
         return Response(status: status, body: ResponseBody(byteBuffer: body))
     }
 }
@@ -46,8 +46,8 @@ extension TokenIssuerDirectory: Hummingbird.ResponseGenerator {
 }
 
 extension PrivacyPass.TokenResponse: Hummingbird.ResponseGenerator {
-    public func response(from _: HummingbirdCore.Request, context: some RequestContext) throws -> Response {
-        let body = context.allocator.buffer(bytes: bytes())
+    public func response(from _: HummingbirdCore.Request, context _: some RequestContext) throws -> Response {
+        let body = ByteBuffer(bytes: bytes())
         return Response(
             status: .ok,
             headers: [.contentType: "application/private-token-response"],
@@ -56,8 +56,8 @@ extension PrivacyPass.TokenResponse: Hummingbird.ResponseGenerator {
 }
 
 extension PrivacyPass.PublicKey: Hummingbird.ResponseGenerator {
-    public func response(from _: Request, context: some RequestContext) throws -> Response {
-        let body = try context.allocator.buffer(bytes: spki())
+    public func response(from _: Request, context _: some RequestContext) throws -> Response {
+        let body = try ByteBuffer(bytes: spki())
         return Response(status: .ok, body: .init(byteBuffer: body))
     }
 }

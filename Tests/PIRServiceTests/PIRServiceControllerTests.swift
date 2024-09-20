@@ -36,8 +36,7 @@ class PIRServiceControllerTests: XCTestCase {
         let config = try KeywordPirConfig(
             dimensionCount: 2,
             cuckooTableConfig: .defaultKeywordPir(maxSerializedBucketSize: context.bytesPerPlaintext),
-            unevenDimensions: false,
-            keyCompression: .noCompression)
+            unevenDimensions: false, keyCompression: .noCompression)
         let processed = try ServerType.process(
             database: databaseRows,
             config: config,
@@ -71,15 +70,15 @@ class PIRServiceControllerTests: XCTestCase {
         let app = try await buildApplication(evaluationKeyStore: evaluationKeyStore)
         let user = UserIdentifier()
 
-        let evalKeyMetadata = Apple_SwiftHomomorphicEncryption_Api_V1_EvaluationKeyMetadata.with { metadata in
+        let evalKeyMetadata = Apple_SwiftHomomorphicEncryption_Api_Shared_V1_EvaluationKeyMetadata.with { metadata in
             metadata.timestamp = UInt64(Date.now.timeIntervalSince1970)
             metadata.identifier = Data("test".utf8)
         }
-        let evalKey = Apple_SwiftHomomorphicEncryption_Api_V1_EvaluationKey.with { evalKey in
+        let evalKey = Apple_SwiftHomomorphicEncryption_Api_Shared_V1_EvaluationKey.with { evalKey in
             evalKey.metadata = evalKeyMetadata
             evalKey.evaluationKey = Apple_SwiftHomomorphicEncryption_V1_SerializedEvaluationKey()
         }
-        let evaluationKeys = Apple_SwiftHomomorphicEncryption_Api_V1_EvaluationKeys.with { evalKeys in
+        let evaluationKeys = Apple_SwiftHomomorphicEncryption_Api_Shared_V1_EvaluationKeys.with { evalKeys in
             evalKeys.keys = [evalKey]
         }
         try await app.test(.live) { client in
@@ -92,7 +91,7 @@ class PIRServiceControllerTests: XCTestCase {
             let persistKey = PIRServiceController.persistKey(user: user, configHash: evalKeyMetadata.identifier)
             let storedKey = try await evaluationKeyStore.get(
                 key: persistKey,
-                as: Protobuf<Apple_SwiftHomomorphicEncryption_Api_V1_EvaluationKey>.self)
+                as: Protobuf<Apple_SwiftHomomorphicEncryption_Api_Shared_V1_EvaluationKey>.self)
             XCTAssertEqual(storedKey?.message, evalKey)
         }
     }
@@ -104,14 +103,14 @@ class PIRServiceControllerTests: XCTestCase {
         let app = try await buildApplication(usecaseStore: usecaseStore)
         let user = UserIdentifier()
 
-        let configRequest = Apple_SwiftHomomorphicEncryption_Api_V1_ConfigRequest.with { configReq in
+        let configRequest = Apple_SwiftHomomorphicEncryption_Api_Pir_V1_ConfigRequest.with { configReq in
             configReq.usecases = ["test"]
         }
         try await app.test(.live) { client in
             try await client.execute(uri: "/config", userIdentifier: user, message: configRequest) { response in
                 XCTAssertEqual(response.status, .ok)
                 let configResponse = try response
-                    .message(as: Apple_SwiftHomomorphicEncryption_Api_V1_ConfigResponse.self)
+                    .message(as: Apple_SwiftHomomorphicEncryption_Api_Pir_V1_ConfigResponse.self)
                 try XCTAssertEqual(configResponse.configs["test"], exampleUsecase.config())
                 try XCTAssertEqual(configResponse.keyInfo[0].keyConfig, exampleUsecase.evaluationKeyConfig())
             }
@@ -131,17 +130,17 @@ class PIRServiceControllerTests: XCTestCase {
 
             // MARK: get configuration
 
-            var config = Apple_SwiftHomomorphicEncryption_Api_V1_PIRConfig()
+            var config = Apple_SwiftHomomorphicEncryption_Api_Pir_V1_PIRConfig()
             var evaluationKeyConfig = Apple_SwiftHomomorphicEncryption_V1_EvaluationKeyConfig()
 
             try await client.execute(
                 uri: "/config",
                 userIdentifier: user,
-                message: Apple_SwiftHomomorphicEncryption_Api_V1_ConfigRequest())
+                message: Apple_SwiftHomomorphicEncryption_Api_Pir_V1_ConfigRequest())
             { response in
                 XCTAssertEqual(response.status, .ok)
                 let configResponse = try response
-                    .message(as: Apple_SwiftHomomorphicEncryption_Api_V1_ConfigResponse.self)
+                    .message(as: Apple_SwiftHomomorphicEncryption_Api_Pir_V1_ConfigResponse.self)
 
                 config = try XCTUnwrap(configResponse.configs["test"]).pirConfig
                 evaluationKeyConfig = configResponse.keyInfo[0].keyConfig
@@ -152,8 +151,7 @@ class PIRServiceControllerTests: XCTestCase {
                 dimensionCount: shardConfig.dimensions.count,
                 cuckooTableConfig: CuckooTableConfig
                     .defaultKeywordPir(maxSerializedBucketSize: context.bytesPerPlaintext),
-                unevenDimensions: false,
-                keyCompression: .noCompression)
+                unevenDimensions: false, keyCompression: .noCompression)
             let pirParameter = shardConfig.native(
                 batchSize: Int(config.batchSize),
                 evaluationKeyConfig: evaluationKeyConfig.native())
@@ -168,15 +166,16 @@ class PIRServiceControllerTests: XCTestCase {
             let evaluationKey = try keywordPirClient.generateEvaluationKey(using: secretKey)
 
             let serializedEvalKey = evaluationKey.serialize().proto()
-            let evalKeyMetadata = try Apple_SwiftHomomorphicEncryption_Api_V1_EvaluationKeyMetadata.with { metadata in
-                metadata.timestamp = UInt64(Date.now.timeIntervalSince1970)
-                metadata.identifier = try evaluationKeyConfig.sha256()
-            }
-            let evalKey = Apple_SwiftHomomorphicEncryption_Api_V1_EvaluationKey.with { evalKey in
+            let evalKeyMetadata = try Apple_SwiftHomomorphicEncryption_Api_Shared_V1_EvaluationKeyMetadata
+                .with { metadata in
+                    metadata.timestamp = UInt64(Date.now.timeIntervalSince1970)
+                    metadata.identifier = try evaluationKeyConfig.sha256()
+                }
+            let evalKey = Apple_SwiftHomomorphicEncryption_Api_Shared_V1_EvaluationKey.with { evalKey in
                 evalKey.metadata = evalKeyMetadata
                 evalKey.evaluationKey = serializedEvalKey
             }
-            let evaluationKeys = Apple_SwiftHomomorphicEncryption_Api_V1_EvaluationKeys.with { evalKeys in
+            let evaluationKeys = Apple_SwiftHomomorphicEncryption_Api_Shared_V1_EvaluationKeys.with { evalKeys in
                 evalKeys.keys = [evalKey]
             }
 
@@ -190,25 +189,25 @@ class PIRServiceControllerTests: XCTestCase {
 
             let query = try keywordPirClient.generateQuery(at: queryKeyword, using: secretKey)
 
-            let pirRequest = try Apple_SwiftHomomorphicEncryption_Api_V1_PIRRequest.with { pirRequest in
+            let pirRequest = try Apple_SwiftHomomorphicEncryption_Api_Pir_V1_PIRRequest.with { pirRequest in
                 pirRequest.shardIndex = 0
                 pirRequest.query = try query.proto()
                 pirRequest.evaluationKeyMetadata = evalKeyMetadata
                 // TODO: fill other fields?
             }
-            let request = Apple_SwiftHomomorphicEncryption_Api_V1_Request.with { request in
+            let request = Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Request.with { request in
                 request.usecase = "test"
                 request.pirRequest = pirRequest
             }
-            let requests = Apple_SwiftHomomorphicEncryption_Api_V1_Requests.with { requests in
+            let requests = Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Requests.with { requests in
                 requests.requests = [request]
             }
 
-            var pirResponse = Apple_SwiftHomomorphicEncryption_Api_V1_PIRResponse()
+            var pirResponse = Apple_SwiftHomomorphicEncryption_Api_Pir_V1_PIRResponse()
             try await client
                 .execute(uri: "/queries", userIdentifier: user, message: requests) { response in
                     XCTAssertEqual(response.status, .ok)
-                    let responses = try response.message(as: Apple_SwiftHomomorphicEncryption_Api_V1_Responses.self)
+                    let responses = try response.message(as: Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Responses.self)
                     pirResponse = responses.responses[0].pirResponse
                 }
 

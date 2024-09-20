@@ -143,8 +143,7 @@ done faster. For this we will use the
 utility.
 
 > Important: These example configurations are just for example. Please see
-> [Parameter
-> Tuning](https://swiftpackageindex.com/apple/swift-homomorphic-encryption/main/documentation/privateinformationretrieval/parametertuning)
+> [Parameter Tuning](https://swiftpackageindex.com/apple/swift-homomorphic-encryption/main/documentation/privateinformationretrieval/parametertuning)
 > to learn how to adjust the configuration for your dataset.
 
 Write the following configuration into a file called `block-config.json`.
