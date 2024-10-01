@@ -34,7 +34,7 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-crypto.git", from: "3.5.0"),
         .package(
             url: "git@github.pie.apple.com:SIMLCryptoAndPrivacy/swift-homomorphic-encryption.git",
-            from: "1.0.0-rc.1"),
+            from: "1.0.0"),
         .package(url: "https://github.com/apple/swift-protobuf.git", from: "1.27.0"),
         .package(url: "https://github.com/hummingbird-project/hummingbird", from: "2.0.0"),
         .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.0.0"),
