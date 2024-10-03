@@ -15,6 +15,7 @@
 import Foundation
 import HomomorphicEncryptionProtobuf
 import Hummingbird
+import HummingbirdCompression
 import PrivateInformationRetrievalProtobuf
 
 struct PIRServiceController {
@@ -28,8 +29,9 @@ struct PIRServiceController {
     func addRoutes(to group: RouterGroup<AppContext>) {
         group.add(middleware: ExtractUserIdentifierMiddleware())
             .post("/key", use: key)
-            .post("/config", use: config)
             .post("/queries", use: queries)
+            .add(middleware: ResponseCompressionMiddleware())
+            .post("/config", use: config)
     }
 
     @Sendable
