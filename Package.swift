@@ -35,6 +35,7 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-homomorphic-encryption", from: "1.0.0"),
         .package(url: "https://github.com/apple/swift-protobuf.git", from: "1.27.0"),
         .package(url: "https://github.com/hummingbird-project/hummingbird", from: "2.0.0"),
+        .package(url: "https://github.com/hummingbird-project/hummingbird-compression", from: "2.0.0-rc.2"),
         .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.0.0"),
     ],
     targets: [
@@ -46,6 +47,7 @@ let package = Package(
                 .product(name: "Crypto", package: "swift-crypto"),
                 .product(name: "HomomorphicEncryptionProtobuf", package: "swift-homomorphic-encryption"),
                 .product(name: "Hummingbird", package: "hummingbird"),
+                .product(name: "HummingbirdCompression", package: "hummingbird-compression"),
                 .product(name: "PrivateInformationRetrievalProtobuf", package: "swift-homomorphic-encryption"),
                 .product(name: "SwiftASN1", package: "swift-asn1"),
             ],

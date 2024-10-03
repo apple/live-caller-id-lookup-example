@@ -117,6 +117,77 @@ class PIRServiceControllerTests: XCTestCase {
         }
     }
 
+    func testCompressedConfigFetch() async throws {
+        // Mock usecase that has a large config with 10K randomized shardConfigs.
+        struct TestUseCaseWithLargeConfig: Usecase {
+            init() {
+                let shardConfigs = (0..<10000).map { _ in
+                    Apple_SwiftHomomorphicEncryption_Api_Pir_V1_PIRShardConfig.with { shardConfig in
+                        shardConfig.numEntries = UInt64.random(in: 0..<1000)
+                        shardConfig.entrySize = UInt64.random(in: 0..<1000)
+                        shardConfig.dimensions = [UInt64.random(in: 0..<100), UInt64.random(in: 0..<100)]
+                    }
+                }
+
+                self.randomConfig = Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Config.with { config in
+                    config.pirConfig = .with { pirConfig in
+                        pirConfig.shardConfigs = shardConfigs
+                    }
+                }
+            }
+
+            let randomConfig: Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Config
+
+            func config() throws -> Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Config {
+                randomConfig
+            }
+
+            func evaluationKeyConfig() throws -> Apple_SwiftHomomorphicEncryption_V1_EvaluationKeyConfig {
+                Apple_SwiftHomomorphicEncryption_V1_EvaluationKeyConfig()
+            }
+
+            func process(
+                request _: Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Request,
+                evaluationKey _: Apple_SwiftHomomorphicEncryption_Api_Shared_V1_EvaluationKey) async throws
+                -> Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Response
+            {
+                Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Response()
+            }
+        }
+
+        let usecaseStore = UsecaseStore()
+        let exampleUsecase = TestUseCaseWithLargeConfig()
+        await usecaseStore.set(name: "test", usecase: exampleUsecase)
+
+        let app = try await buildApplication(usecaseStore: usecaseStore)
+        let user = UserIdentifier()
+
+        let configRequest = Apple_SwiftHomomorphicEncryption_Api_Pir_V1_ConfigRequest.with { configReq in
+            configReq.usecases = ["test"]
+        }
+
+        let uncompressedConfigSize = try exampleUsecase.randomConfig.serializedData().count
+        try await app.test(.live) { client in
+            try await client.execute(
+                uri: "/config",
+                userIdentifier: user,
+                message: configRequest,
+                acceptCompression: true)
+            { response in
+                XCTAssertEqual(response.status, .ok)
+                XCTAssertEqual(response.headers[.contentEncoding], "gzip")
+                XCTAssertEqual(response.headers[.transferEncoding], "chunked")
+                var compressedBody = response.body
+                XCTAssertLessThan(compressedBody.readableBytes, uncompressedConfigSize)
+                let uncompressed = try compressedBody.decompress(with: .gzip())
+                let configResponse =
+                    try Apple_SwiftHomomorphicEncryption_Api_Pir_V1_ConfigResponse(
+                        serializedBytes: Array(buffer: uncompressed))
+                try XCTAssertEqual(configResponse.configs["test"], exampleUsecase.config())
+            }
+        }
+    }
+
     func testRequest() async throws {
         typealias Scheme = Bfv<UInt64>
         let usecaseStore = UsecaseStore()

@@ -23,10 +23,14 @@ public extension TestClientProtocol {
         uri: String,
         userIdentifier: UserIdentifier,
         message: some Message,
+        acceptCompression: Bool = false,
         testCallback: @escaping (TestResponse) async throws -> Return = { $0 }) async throws -> Return
     {
         let bodyBuffer = try ByteBuffer(data: message.serializedData())
-        let headers: HTTPFields = [.userIdentifier: userIdentifier.identifier]
+        var headers: HTTPFields = [.userIdentifier: userIdentifier.identifier]
+        if acceptCompression {
+            headers[.acceptEncoding] = "gzip"
+        }
         let response = try await executeRequest(uri: uri, method: .post, headers: headers, body: bodyBuffer)
         return try await testCallback(response)
     }

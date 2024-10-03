@@ -1,5 +1,5 @@
 {
-  "originHash" : "3e543317e5aefdb9f50f59e851b877b3b6af8997034a5657f791c7a60febb9ce",
+  "originHash" : "a8283d84c07f02390e501e27aead610f1420e15e5b665c7ce15f0c17496a23d5",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -11,12 +11,30 @@
       }
     },
     {
+      "identity" : "compress-nio",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/adam-fowler/compress-nio.git",
+      "state" : {
+        "revision" : "a52d3ac5f48820846d34d78d6f59316481e84968",
+        "version" : "1.2.1"
+      }
+    },
+    {
       "identity" : "hummingbird",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/hummingbird-project/hummingbird",
       "state" : {
         "revision" : "d4f792d209f02b26a17c0105751220da65207fb2",
         "version" : "2.0.1"
+      }
+    },
+    {
+      "identity" : "hummingbird-compression",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/hummingbird-project/hummingbird-compression",
+      "state" : {
+        "revision" : "78cb36ee8ebbb4a95c56979a98d6161b9890a970",
+        "version" : "2.0.0-rc.2"
       }
     },
     {
@@ -114,8 +132,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-homomorphic-encryption",
       "state" : {
-        "revision" : "cf5a7d70169b44ecaafc8f645653f6873d9ae5ba",
-        "version" : "1.0.0"
+        "revision" : "1d7e43a45123ce3190b0545fad05bde25d28980c",
+        "version" : "1.0.1"
       }
     },
     {
@@ -193,7 +211,7 @@
     {
       "identity" : "swift-numerics",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-numerics.git",
+      "location" : "https://github.com/apple/swift-numerics",
       "state" : {
         "revision" : "0a5bc04095a675662cf24757cc0640aa2204253b",
         "version" : "1.0.2"
