@@ -1,4 +1,4 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 5.10
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 // Copyright 2024 Apple Inc. and the Swift Homomorphic Encryption project authors
@@ -18,6 +18,7 @@
 import PackageDescription
 
 let swiftSettings: [SwiftSetting] = [
+    .enableExperimentalFeature("StrictConcurrency"),
     .unsafeFlags(["-cross-module-optimization"], .when(configuration: .release)),
 ]
 
@@ -90,6 +91,6 @@ let package = Package(
 #if canImport(Darwin)
 // Set the minimum macOS version for the package
 package.platforms = [
-    .macOS(.v15), // Constrained by Swift 6 support for Xcode (https://developer.apple.com/support/xcode/)
+    .macOS(.v14), // Constrained by Swift 5.10 support for Xcode (https://developer.apple.com/support/xcode/)
 ]
 #endif
