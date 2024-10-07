@@ -13,13 +13,174 @@
 // limitations under the License.
 
 /// Privacy Pass error.
-public enum PrivacyPassError: Error, Equatable, Sendable {
-    case invalidKeySize
-    case invalidSPKIFormat
-    case invalidTokenKeyId
-    case invalidTokenRequestBlindedMessageSize
-    case invalidTokenRequestSize
-    case invalidTokenResponseSize
-    case invalidTokenSize
-    case invalidTokenType
+public struct PrivacyPassError: Error, Equatable, Sendable {
+    /// A high-level error code to provide a broad classification.
+    public var code: Code
+
+    /// The location from which this error was thrown.
+    public var location: SourceLocation
+
+    /// Creates a new ``PrivacyPassError``.
+    /// - Parameters:
+    ///   - code: Error code.
+    ///   - location: Source location where the error occured.
+    @inlinable
+    public init(code: Code, location: SourceLocation) {
+        self.code = code
+        self.location = location
+    }
+
+    /// Creates a new ``PrivacyPassError``.
+    /// - Parameters:
+    ///   - code: Error code.
+    ///   - function: The function in which the error was thrown.
+    ///   - file: The file in which the error was thrown.
+    ///   - line: The line on which the error was thrown.
+    @inlinable
+    public init(
+        code: Code,
+        function: String = #function,
+        file: String = #fileID,
+        line: Int = #line)
+    {
+        self.code = code
+        self.location = SourceLocation(function: function, file: file, line: line)
+    }
+}
+
+extension PrivacyPassError: CustomStringConvertible {
+    public var description: String {
+        "\(code)"
+    }
+}
+
+extension PrivacyPassError: CustomDebugStringConvertible {
+    public var debugDescription: String {
+        "\(code): \(location.description)"
+    }
+}
+
+public extension PrivacyPassError {
+    /// A high level indication of the kind of error being thrown.
+    struct Code: Hashable, Sendable, CustomStringConvertible {
+        // Adding cases to an enum is source-breaking (since adopters might switch on an enum value without a default).
+        // So we keep the enum private.
+        private enum InternalCode: Hashable, Sendable, CustomStringConvertible { // swiftlint:disable:this nesting
+            case invalidKeySize
+            case invalidSPKIFormat
+            case invalidTokenKeyId
+            case invalidTokenRequestBlindedMessageSize
+            case invalidTokenRequestSize
+            case invalidTokenResponseSize
+            case invalidTokenSize
+            case invalidTokenType
+
+            var description: String {
+                switch self {
+                case .invalidKeySize:
+                    "Invalid key size"
+                case .invalidSPKIFormat:
+                    "Invalid SPKI Format"
+                case .invalidTokenKeyId:
+                    "Invalid Token Id"
+                case .invalidTokenRequestBlindedMessageSize:
+                    "Invalid token request blinded message size"
+                case .invalidTokenRequestSize:
+                    "Invalid token request size"
+                case .invalidTokenResponseSize:
+                    "Invalid token response size"
+                case .invalidTokenSize:
+                    "Invalid token size"
+                case .invalidTokenType:
+                    "Invalid token type"
+                }
+            }
+        }
+
+        public var description: String {
+            String(describing: code)
+        }
+
+        private var code: InternalCode
+
+        private init(_ code: InternalCode) {
+            self.code = code
+        }
+
+        /// Invalid key size.
+        public static var invalidKeySize: Self {
+            Self(.invalidKeySize)
+        }
+
+        /// Invalid SPKI format.
+        public static var invalidSPKIFormat: Self {
+            Self(.invalidSPKIFormat)
+        }
+
+        /// Invalid token identifier.
+        public static var invalidTokenKeyId: Self {
+            Self(.invalidTokenKeyId)
+        }
+
+        /// Invalid blinded message size in the token request.
+        public static var invalidTokenRequestBlindedMessageSize: Self {
+            Self(.invalidTokenRequestBlindedMessageSize)
+        }
+
+        /// Invalid token request size.
+        public static var invalidTokenRequestSize: Self {
+            Self(.invalidTokenRequestSize)
+        }
+
+        /// Invalid token response size.
+        public static var invalidTokenResponseSize: Self {
+            Self(.invalidTokenResponseSize)
+        }
+
+        /// Invalid token size.
+        public static var invalidTokenSize: Self {
+            Self(.invalidTokenSize)
+        }
+
+        /// Invalid token type.
+        public static var invalidTokenType: Self {
+            Self(.invalidTokenType)
+        }
+    }
+
+    /// A location within source code.
+    struct SourceLocation: Sendable, Hashable, CustomStringConvertible {
+        /// The function in which the error was thrown.
+        public let function: String
+
+        /// The file in which the error was thrown.
+        public let file: String
+
+        /// The line on which the error was thrown.
+        public let line: Int
+
+        public var description: String {
+            "in \(function) at \(file):\(line)"
+        }
+
+        /// Creates a new ``SourceLocation``
+        /// - Parameters:
+        ///   - function: The function in which the error was thrown.
+        ///   - file: The file in which the error was thrown.
+        ///   - line: The line on which the error was thrown.
+        public init(function: String, file: String, line: Int) {
+            self.function = function
+            self.file = file
+            self.line = line
+        }
+
+        /// A ``SourceLocation`` which is the current location.
+        /// - Parameters:
+        ///   - function: The function in which the error was thrown.
+        ///   - file: The file in which the error was thrown.
+        ///   - line: The line on which the error was thrown.
+        public static func here(function: String = #function, file: String = #fileID, line: Int = #line) -> Self {
+            SourceLocation(function: function, file: file, line: line)
+        }
+    }
 }
