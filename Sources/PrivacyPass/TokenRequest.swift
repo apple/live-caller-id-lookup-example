@@ -50,7 +50,7 @@ public struct TokenRequest: Equatable {
     /// - Parameter bytes: Collection of bytes representing a token request.
     public init<C: Collection<UInt8>>(from bytes: C) throws {
         guard bytes.count == Self.sizeInBytes else {
-            throw PrivacyPassError.invalidTokenRequestSize
+            throw PrivacyPassError(code: .invalidTokenRequestSize)
         }
         var offset = bytes.startIndex
 

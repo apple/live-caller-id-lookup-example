@@ -30,7 +30,7 @@ public struct Issuer: Sendable {
     /// - Parameter privateKey: Private key to use for issuing tokens.
     public init(privateKey: PrivateKey) throws {
         guard privateKey.backing.keySizeInBits == TokenTypeBlindRSAKeySizeInBits else {
-            throw PrivacyPassError.invalidKeySize
+            throw PrivacyPassError(code: .invalidKeySize)
         }
         self.privateKey = privateKey
         self.truncatedTokenKeyId = privateKey.publicKey.truncatedTokenKeyId
@@ -49,13 +49,13 @@ public struct Issuer: Sendable {
     /// Response](https://www.rfc-editor.org/rfc/rfc9578#name-issuer-to-client-response-2)
     public func issue(request: TokenRequest) throws -> TokenResponse {
         guard request.tokenType == TokenTypeBlindRSA else {
-            throw PrivacyPassError.invalidTokenType
+            throw PrivacyPassError(code: .invalidTokenType)
         }
         guard request.truncatedTokenKeyId == truncatedTokenKeyId else {
-            throw PrivacyPassError.invalidTokenKeyId
+            throw PrivacyPassError(code: .invalidTokenKeyId)
         }
         guard request.blindedMsg.count == TokenTypeBlindRSANK else {
-            throw PrivacyPassError.invalidTokenRequestBlindedMessageSize
+            throw PrivacyPassError(code: .invalidTokenRequestBlindedMessageSize)
         }
 
         let signature = try privateKey.backing.blindSignature(for: request.blindedMsg)

@@ -21,7 +21,7 @@ extension PrivacyPass.PrivacyPassError: Hummingbird.HTTPResponseError {
         // From: https://www.rfc-editor.org/rfc/rfc9578#name-issuer-to-client-response-2
         // If any of these conditions are not met, the Issuer MUST return an HTTP 422 (Unprocessable Content) error to
         // the Client.
-        switch self {
+        switch code {
         case .invalidTokenKeyId:
             .unprocessableContent
         case .invalidTokenRequestBlindedMessageSize:
