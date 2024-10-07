@@ -36,7 +36,7 @@ public struct TokenResponse: Equatable {
     /// - Parameter bytes: Collection of bytes representing a token reponse.
     public init(from bytes: some Collection<UInt8>) throws {
         guard bytes.count == Self.sizeInBytes else {
-            throw PrivacyPassError.invalidTokenResponseSize
+            throw PrivacyPassError(code: .invalidTokenResponseSize)
         }
         self.blindSignature = Array(bytes)
     }

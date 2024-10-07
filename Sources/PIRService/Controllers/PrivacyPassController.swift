@@ -73,7 +73,7 @@ struct PrivacyPassController<UserAuthenticator: UserTokenAuthenticator> {
         var tokenRequestByteBuffer = try await request.body.collect(upTo: PrivacyPass.TokenRequest.sizeInBytes)
         guard let tokenRequestBytes = tokenRequestByteBuffer.readBytes(length: PrivacyPass.TokenRequest.sizeInBytes)
         else {
-            throw PrivacyPass.PrivacyPassError.invalidTokenRequestSize
+            throw PrivacyPass.PrivacyPassError(code: .invalidTokenRequestSize)
         }
         let tokenRequest = try PrivacyPass.TokenRequest(from: tokenRequestBytes)
 

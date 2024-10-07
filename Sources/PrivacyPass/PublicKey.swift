@@ -65,7 +65,7 @@ public struct PublicKey: Sendable {
               let rsassaPSSParams = try? RSASSAPSSParams(asn1Any: parameters),
               rsassaPSSParams == Self.rsassaPSSParams
         else {
-            throw PrivacyPassError.invalidSPKIFormat
+            throw PrivacyPassError(code: .invalidSPKIFormat)
         }
 
         // overwrite algorithmIdentifier such the Crypto can recognize the format
