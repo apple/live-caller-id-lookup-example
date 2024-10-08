@@ -25,6 +25,11 @@ struct AppContext: IdentifiedRequestContext, AuthenticatedRequestContext, Reques
     var userIdentifier: UserIdentifier
     var userTier: UserTier
 
+    // override pload size to 10MiB, the default 2MiB limit is too small for some evaluation keys.
+    var maxUploadSize: Int {
+        10 * 1024 * 1024
+    }
+
     init(source: ApplicationRequestContextSource) {
         self.coreContext = .init(source: source)
         self.userIdentifier = UserIdentifier(identifier: "")
