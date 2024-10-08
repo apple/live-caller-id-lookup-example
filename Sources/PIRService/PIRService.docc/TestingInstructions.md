@@ -154,7 +154,7 @@ Write the following configuration into a file called `block-config.json`.
   "outputPirParameters": "block-SHARD_ID.params.txtpb",
   "rlweParameters": "n_4096_logq_27_28_28_logt_5",
   "sharding": {
-    "entryCountPerShard": 1000
+    "entryCountPerShard": 50000
   },
   "trialsPerShard": 5
 }
@@ -179,7 +179,7 @@ Now we do basically the same thing for the identity database: write the followin
   "outputPirParameters": "identity-SHARD_ID.params.txtpb",
   "rlweParameters": "n_4096_logq_27_28_28_logt_5",
   "sharding" : {
-    "entryCountPerShard" : 1000
+    "entryCountPerShard" : 5000
   },
   "trialsPerShard": 5
 }
