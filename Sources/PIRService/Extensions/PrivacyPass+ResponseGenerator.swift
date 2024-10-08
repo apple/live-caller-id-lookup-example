@@ -17,7 +17,7 @@ import PrivacyPass
 
 extension PrivacyPass.PrivacyPassError: Hummingbird.HTTPResponseError {
     public var status: HTTPTypes.HTTPResponse.Status {
-        // Default to `.badRequest` however, some erros types are specified to return HTTP 422.
+        // Default to `.badRequest` however, some error types are specified to return HTTP 422.
         // From: https://www.rfc-editor.org/rfc/rfc9578#name-issuer-to-client-response-2
         // If any of these conditions are not met, the Issuer MUST return an HTTP 422 (Unprocessable Content) error to
         // the Client.
