@@ -18,6 +18,17 @@ import Foundation
 import XCTest
 
 class PrivacyPassTests: XCTestCase {
+    private enum InvalidHexString: Error {
+        case invalidHexString
+    }
+
+    private func unhex(_ hexString: String) throws -> [UInt8] {
+        guard let array = Array(hexEncoded: hexString) else {
+            throw InvalidHexString.invalidHexString
+        }
+        return array
+    }
+
     func testConvertAndLoadPublicKey() throws {
         let privateKey = try PrivacyPass.PrivateKey()
         let spki = try privateKey.publicKey.spki()
@@ -69,24 +80,13 @@ class PrivacyPassTests: XCTestCase {
             }
         }
 
-        enum InvalidHexString: Error {
-            case invalidHexString
-        }
-
-        func unhex(_ hexString: String) throws -> [UInt8] {
-            guard let array = Array(hexEncoded: hexString) else {
-                throw InvalidHexString.invalidHexString
-            }
-            return array
-        }
-
         let testVectors = try TestVector.load(from: URL(
             fileURLWithPath: "TestVectors/PrivacyPassPublicTokens.json",
             relativeTo: URL(fileURLWithPath: #filePath)))
         for testVector in testVectors {
             // load private key
             let skS = try unhex(testVector.skS)
-            let privateKeyPEM = try XCTUnwrap(String(decoding: Data(skS), as: UTF8.self))
+            let privateKeyPEM = try XCTUnwrap(String(data: Data(skS), encoding: .ascii))
             let privateKey = try PrivacyPass.PrivateKey(pemRepresentation: privateKeyPEM)
             // verify public key is correctly encoded
             let pkS = try unhex(testVector.pkS)
@@ -117,6 +117,96 @@ class PrivacyPassTests: XCTestCase {
             let verifier = PrivacyPass.Verifier(publicKey: privateKey.publicKey, nonceStore: InMemoryNonceStore())
             let verified = try await verifier.verify(token: token)
             XCTAssertTrue(verified)
+        }
+    }
+
+    func testTokenChallenge() throws {
+        // token challenge with issuer = "test"
+        let referenceBytes: [UInt8] = [0, 2, 0, 4, 116, 101, 115, 116, 0, 0, 0]
+        let tokenChallenge = try TokenChallenge(tokenType: TokenTypeBlindRSA, issuer: "test")
+        let challengeBytes = try tokenChallenge.bytes()
+        XCTAssertEqual(challengeBytes, referenceBytes)
+        let decodedChallenge = try TokenChallenge(from: challengeBytes)
+        XCTAssertEqual(decodedChallenge, tokenChallenge)
+    }
+
+    func testChallengeVectors() throws {
+        struct TestVector: Codable {
+            // Note: we use implicitly unwrapped optionals, becuase test vector 6 from
+            // https://www.rfc-editor.org/rfc/rfc9577#name-challenge-and-redemption-st
+            // does not have all the fields. In the actual test, we skip over test vector 6, and therefore we will not
+            // use a missing field.
+
+            // swiftlint:disable implicitly_unwrapped_optional
+            let test_vector: Int
+            let token_type: String
+            let issuer_name_text: String!
+            let issuer_name: String!
+            let origin_info_text: [String]!
+            let origin_info: String!
+            let redemption_context: String!
+            let nonce: String!
+            let token_key_id: String!
+            let token_authenticator_input: String
+            // swiftlint:enable implicitly_unwrapped_optional
+
+            static func load(from path: URL) throws -> [Self] {
+                let json = try Data(contentsOf: path)
+                let decoder = JSONDecoder()
+                return try decoder.decode([Self].self, from: json)
+            }
+        }
+
+        let testVectors = try TestVector.load(from: URL(
+            fileURLWithPath: "TestVectors/PrivacyPassChallengeAndRedemptionStructure.json",
+            relativeTo: URL(fileURLWithPath: #filePath)))
+        XCTAssertEqual(testVectors.count, 6)
+        for testVector in testVectors {
+            let tokenType = try UInt16(bigEndianBytes: unhex(testVector.token_type))
+            guard tokenType == TokenTypeBlindRSA else {
+                // skip test vector 6 which has missing fields.
+                continue
+            }
+            let redemptionContext = try unhex(testVector.redemption_context)
+            let tokenChallenge = try TokenChallenge(
+                tokenType: tokenType,
+                issuer: testVector.issuer_name_text,
+                redemptionContext: redemptionContext,
+                originInfo: testVector.origin_info_text)
+
+            let nonce = try unhex(testVector.nonce)
+            let tokenKeyId = try unhex(testVector.token_key_id)
+            let tokenAuthenticatorInput = try unhex(testVector.token_authenticator_input)
+
+            let challengeBytes = try tokenChallenge.bytes()
+            let challengeDigest = SHA256.hash(data: challengeBytes)
+            var tokenInput: [UInt8] = []
+            tokenInput.append(contentsOf: tokenType.bigEndianBytes)
+            tokenInput.append(contentsOf: nonce)
+            tokenInput.append(contentsOf: challengeDigest)
+            tokenInput.append(contentsOf: tokenKeyId)
+
+            XCTAssertEqual(tokenInput, tokenAuthenticatorInput)
+
+            // test parsing challenge bytes
+            let parsed = try TokenChallenge(from: challengeBytes)
+            XCTAssertEqual(parsed, tokenChallenge)
+
+            // construct challenge bytes from fields
+            let issuerName = try unhex(testVector.issuer_name)
+            let originInfo = try unhex(testVector.origin_info)
+
+            var constructedChallengeBytes: [UInt8] = []
+            constructedChallengeBytes.append(contentsOf: tokenType.bigEndianBytes)
+            constructedChallengeBytes.append(contentsOf: UInt16(issuerName.count).bigEndianBytes)
+            constructedChallengeBytes.append(contentsOf: issuerName)
+            constructedChallengeBytes.append(UInt8(redemptionContext.count))
+            constructedChallengeBytes.append(contentsOf: redemptionContext)
+            constructedChallengeBytes.append(contentsOf: UInt16(originInfo.count).bigEndianBytes)
+            constructedChallengeBytes.append(contentsOf: originInfo)
+
+            let constructedChallenge = try TokenChallenge(from: constructedChallengeBytes)
+            XCTAssertEqual(constructedChallenge, tokenChallenge)
         }
     }
 }

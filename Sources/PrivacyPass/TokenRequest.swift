@@ -22,7 +22,7 @@
 ///   uint8_t blinded_msg[Nk];
 /// } TokenRequest;
 /// ```
-public struct TokenRequest: Equatable {
+public struct TokenRequest: Equatable, Sendable {
     public static let blindedMsgSize = TokenTypeBlindRSANK
     public static let sizeInBytes = MemoryLayout<UInt16>.size + MemoryLayout<UInt8>.size + blindedMsgSize
 
