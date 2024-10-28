@@ -20,7 +20,7 @@
 ///   uint8_t blind_sig[Nk];
 /// } TokenResponse;
 /// ```
-public struct TokenResponse: Equatable {
+public struct TokenResponse: Equatable, Sendable {
     static let sizeInBytes = TokenTypeBlindRSANK
 
     /// The blind signature of the token.

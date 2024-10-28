@@ -1,0 +1,67 @@
+[
+    {
+        "test_vector": 1,
+        "token_type": "0002",
+        "issuer_name_text": "issuer.example",
+        "issuer_name": "6973737565722e6578616d706c65",
+        "origin_info_text": ["origin.example"],
+        "origin_info": "6f726967696e2e6578616d706c65",
+        "redemption_context": "476ac2c935f458e9b2d7af32dacfbd22dd6023ef5887a789f1abe004e79bb5bb",
+        "nonce": "e01978182c469e5e026d66558ee186568614f235e41ef7e2378e6f202688abab",
+        "token_key_id": "ca572f8982a9ca248a3056186322d93ca147266121ddeb5632c07f1f71cd2708",
+        "token_authenticator_input": "0002e01978182c469e5e026d66558ee186568614f235e41ef7e2378e6f202688abab8e1d5518ec82964255526efd8f9db88205a8ddd3ffb1db298fcc3ad36c42388fca572f8982a9ca248a3056186322d93ca147266121ddeb5632c07f1f71cd2708"
+    },
+    {
+        "test_vector": 2,
+        "token_type": "0002",
+        "issuer_name_text": "issuer.example",
+        "issuer_name": "6973737565722e6578616d706c65",
+        "origin_info_text": ["origin.example"],
+        "origin_info": "6f726967696e2e6578616d706c65",
+        "redemption_context": "",
+        "nonce": "e01978182c469e5e026d66558ee186568614f235e41ef7e2378e6f202688abab",
+        "token_key_id": "ca572f8982a9ca248a3056186322d93ca147266121ddeb5632c07f1f71cd2708",
+        "token_authenticator_input": "0002e01978182c469e5e026d66558ee186568614f235e41ef7e2378e6f202688abab11e15c91a7c2ad02abd66645802373db1d823bea80f08d452541fb2b62b5898bca572f8982a9ca248a3056186322d93ca147266121ddeb5632c07f1f71cd2708"
+    },
+    {
+        "test_vector": 3,
+        "token_type": "0002",
+        "issuer_name_text": "issuer.example",
+        "issuer_name": "6973737565722e6578616d706c65",
+        "origin_info_text": [],
+        "origin_info": "",
+        "redemption_context": "",
+        "nonce": "e01978182c469e5e026d66558ee186568614f235e41ef7e2378e6f202688abab",
+        "token_key_id": "ca572f8982a9ca248a3056186322d93ca147266121ddeb5632c07f1f71cd2708",
+        "token_authenticator_input": "0002e01978182c469e5e026d66558ee186568614f235e41ef7e2378e6f202688ababb741ec1b6fd05f1e95f8982906aec1612896d9ca97d53eef94ad3c9fe023f7a4ca572f8982a9ca248a3056186322d93ca147266121ddeb5632c07f1f71cd2708"
+    },
+    {
+        "test_vector": 4,
+        "token_type": "0002",
+        "issuer_name_text": "issuer.example",
+        "issuer_name": "6973737565722e6578616d706c65",
+        "origin_info_text": [],
+        "origin_info": "",
+        "redemption_context": "476ac2c935f458e9b2d7af32dacfbd22dd6023ef5887a789f1abe004e79bb5bb",
+        "nonce": "e01978182c469e5e026d66558ee186568614f235e41ef7e2378e6f202688abab",
+        "token_key_id": "ca572f8982a9ca248a3056186322d93ca147266121ddeb5632c07f1f71cd2708",
+        "token_authenticator_input": "0002e01978182c469e5e026d66558ee186568614f235e41ef7e2378e6f202688ababb85fb5bc06edeb0e8e8bdb5b3bea8c4fa40837c82e8bcaf5882c81e14817ea18ca572f8982a9ca248a3056186322d93ca147266121ddeb5632c07f1f71cd2708"
+    },
+    {
+        "test_vector": 5,
+        "token_type": "0002",
+        "issuer_name_text": "issuer.example",
+        "issuer_name": "6973737565722e6578616d706c65",
+        "origin_info_text": ["foo.example", "bar.example"],
+        "origin_info": "666f6f2e6578616d706c652c6261722e6578616d706c65",
+        "redemption_context": "476ac2c935f458e9b2d7af32dacfbd22dd6023ef5887a789f1abe004e79bb5bb",
+        "nonce": "e01978182c469e5e026d66558ee186568614f235e41ef7e2378e6f202688abab",
+        "token_key_id": "ca572f8982a9ca248a3056186322d93ca147266121ddeb5632c07f1f71cd2708",
+        "token_authenticator_input": "0002e01978182c469e5e026d66558ee186568614f235e41ef7e2378e6f202688ababa2a775866b6ae0f98944910c8f48728d8a2735b9157762ddbf803f70e2e8ba3eca572f8982a9ca248a3056186322d93ca147266121ddeb5632c07f1f71cd2708"
+    },
+    {
+        "test_vector": 6,
+        "token_type": "0000",
+        "token_authenticator_input": "000058405ad31e286e874cb42d0ef9d50461ae703bb71a21178beb429c43c0effe587456d856f0f2bdfc216ef93d5c225e2a93e84cb686e63919788087f7ab1054aa817f09dcb919a0ed6f90fe887e8b08cd1eee44d5be8d813eda9f2656db61c932db8d73f8690604ded0120157923bbd19d5549e639e4de07530aee1d370f5187b678685715bd878dde24346751eb532a87b71ea40bbe5a13218658e303c648eb03817453690bfcbe8255081bf27ff0891cd02ee2483e48a2c494bdef696f943fa992a65303292c25d0d3f62da86a70d0b020f0ff5b90d0ff0f6abdb097d321fde04f3a1994e63bcd35a88c21236c7dc67600482223f54b25e39a250439f27ecb5ae9eb8ed548a3ec1f1d6f510d08281929c8fe088342959e35ea9b3b6f6a96fc1a8edba4ed297f4cf02d0e4482b79a11f671745d7b7db120eddd8a4c2b6501bbc895b2160b8071615d9c1b18f32e056bfee29deac6a7d6cf7b522a5badd63b9cb"
+    }
+]

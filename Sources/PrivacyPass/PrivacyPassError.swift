@@ -66,8 +66,13 @@ public extension PrivacyPassError {
         // Adding cases to an enum is source-breaking (since adopters might switch on an enum value without a default).
         // So we keep the enum private.
         private enum InternalCode: Hashable, Sendable, CustomStringConvertible { // swiftlint:disable:this nesting
+            case invalidIssuer
             case invalidKeySize
+            case invalidOriginInfo
+            case invalidRedemptionContext
             case invalidSPKIFormat
+            case invalidTokenChallenge
+            case invalidTokenChallengeSize
             case invalidTokenKeyId
             case invalidTokenRequestBlindedMessageSize
             case invalidTokenRequestSize
@@ -77,12 +82,22 @@ public extension PrivacyPassError {
 
             var description: String {
                 switch self {
+                case .invalidIssuer:
+                    "Invalid issuer"
                 case .invalidKeySize:
                     "Invalid key size"
+                case .invalidOriginInfo:
+                    "Invalid origin info"
+                case .invalidRedemptionContext:
+                    "Invalid redemption context"
                 case .invalidSPKIFormat:
                     "Invalid SPKI Format"
+                case .invalidTokenChallenge:
+                    "Invalid token challenge"
+                case .invalidTokenChallengeSize:
+                    "Invalid token challenge size"
                 case .invalidTokenKeyId:
-                    "Invalid Token Id"
+                    "Invalid token Id"
                 case .invalidTokenRequestBlindedMessageSize:
                     "Invalid token request blinded message size"
                 case .invalidTokenRequestSize:
@@ -107,14 +122,39 @@ public extension PrivacyPassError {
             self.code = code
         }
 
+        /// Invalid issuer.
+        public static var invalidIssuer: Self {
+            Self(.invalidIssuer)
+        }
+
         /// Invalid key size.
         public static var invalidKeySize: Self {
             Self(.invalidKeySize)
         }
 
+        /// Invalid origin info.
+        public static var invalidOriginInfo: Self {
+            Self(.invalidOriginInfo)
+        }
+
+        /// Invalid redemption context.
+        public static var invalidRedemptionContext: Self {
+            Self(.invalidRedemptionContext)
+        }
+
         /// Invalid SPKI format.
         public static var invalidSPKIFormat: Self {
             Self(.invalidSPKIFormat)
+        }
+
+        /// Invalid token challenge.
+        public static var invalidTokenChallenge: Self {
+            Self(.invalidTokenChallenge)
+        }
+
+        /// Invalid token challenge size.
+        public static var invalidTokenChallengeSize: Self {
+            Self(.invalidTokenChallengeSize)
         }
 
         /// Invalid token identifier.

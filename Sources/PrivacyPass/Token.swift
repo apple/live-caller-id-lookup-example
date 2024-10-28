@@ -24,7 +24,7 @@
 ///   uint8_t authenticator[Nk];
 /// } Token;
 /// ```
-public struct Token: Equatable {
+public struct Token: Equatable, Sendable {
     static let nonceSize = 32
     static let challengeDigestSize = 32
     static let tokenKeyIdSize = 32
