@@ -15,7 +15,9 @@
 import Hummingbird
 import HummingbirdTesting
 @testable import PIRService
+import PIRServiceTesting
 import SwiftProtobuf
+import XCTest
 
 public extension TestClientProtocol {
     @discardableResult

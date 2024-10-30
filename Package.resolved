@@ -1,5 +1,5 @@
 {
-  "originHash" : "6fa8c35e973674525293782afadb854343f0c0e20b226b4746f36946e6e5661a",
+  "originHash" : "81af695d55cbdf06a26becbb5df47089de0d98ee22f486d577facc12f7bf5ca2",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -132,8 +132,7 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.pie.apple.com:SIMLCryptoAndPrivacy/swift-homomorphic-encryption.git",
       "state" : {
-        "revision" : "1597e01e69efd7ea8bcac22df7ab1bece07af1cd",
-        "version" : "1.0.1"
+        "revision" : "87104e9cbfe7e9f6559acd44036f3139ba7cb111"
       }
     },
     {

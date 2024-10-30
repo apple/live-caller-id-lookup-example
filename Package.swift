@@ -28,6 +28,7 @@ let package = Package(
         .executable(name: "PIRService", targets: ["PIRService"]),
         .executable(name: "ConstructDatabase", targets: ["ConstructDatabase"]),
         .library(name: "PrivacyPass", targets: ["PrivacyPass"]),
+        .library(name: "PIRServiceTesting", targets: ["PIRServiceTesting"]),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.2.0"),
@@ -35,7 +36,7 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-crypto.git", from: "3.5.0"),
         .package(
             url: "git@github.pie.apple.com:SIMLCryptoAndPrivacy/swift-homomorphic-encryption.git",
-            from: "1.0.0"),
+            revision: "87104e9cbfe7e9f6559acd44036f3139ba7cb111"),
         .package(url: "https://github.com/apple/swift-protobuf.git", from: "1.27.0"),
         .package(url: "https://github.com/hummingbird-project/hummingbird", from: "2.0.0"),
         .package(url: "https://github.com/hummingbird-project/hummingbird-compression", from: "2.0.0-rc.2"),
@@ -52,13 +53,13 @@ let package = Package(
                 .product(name: "Hummingbird", package: "hummingbird"),
                 .product(name: "HummingbirdCompression", package: "hummingbird-compression"),
                 .product(name: "PrivateInformationRetrievalProtobuf", package: "swift-homomorphic-encryption"),
-                .product(name: "SwiftASN1", package: "swift-asn1"),
             ],
             swiftSettings: swiftSettings),
         .testTarget(
             name: "PIRServiceTests",
             dependencies: [
                 "PIRService",
+                "PIRServiceTesting",
                 .product(name: "HummingbirdTesting", package: "hummingbird"),
             ],
             swiftSettings: swiftSettings),
@@ -89,6 +90,15 @@ let package = Package(
             exclude: [
                 "TestVectors/PrivacyPassPublicTokens.json",
                 "TestVectors/PrivacyPassChallengeAndRedemptionStructure.json",
+            ],
+            swiftSettings: swiftSettings),
+        .target(
+            name: "PIRServiceTesting",
+            dependencies: [
+                "PrivacyPass",
+                .product(name: "HomomorphicEncryptionProtobuf", package: "swift-homomorphic-encryption"),
+                .product(name: "HummingbirdTesting", package: "hummingbird"),
+                .product(name: "PrivateInformationRetrievalProtobuf", package: "swift-homomorphic-encryption"),
             ],
             swiftSettings: swiftSettings),
     ])

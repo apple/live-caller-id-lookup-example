@@ -34,7 +34,7 @@ struct PrivacyPassController<UserAuthenticator: UserTokenAuthenticator> {
         guard let userToken = request.headers.bearerToken,
               let userTier = try await state.userAuthenticator.authenticate(userToken: userToken)
         else {
-            throw HTTPError(.unauthorized)
+            throw HTTPError(.unauthorized, message: "User token is unauthorized")
         }
         return userTier
     }
