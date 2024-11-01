@@ -53,6 +53,7 @@ func buildApplication(
 {
     let router = Router(context: AppContext.self)
     router.middlewares.add(LogRequestsMiddleware(.info, includeHeaders: .none))
+    router.middlewares.add(LogErrorsMiddleware())
 
     let pirServiceController = PIRServiceController(usecases: usecaseStore, evaluationKeyStore: evaluationKeyStore)
     let pirGroup = router.group()

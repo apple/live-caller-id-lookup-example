@@ -17,13 +17,17 @@ import HomomorphicEncryption
 import PrivateInformationRetrieval
 
 enum ExampleUsecase {
+    /// Usecase where there are keys in the range `0..<10` and the values are equal to keys.
+    static let ten: Usecase = // swiftlint:disable:next force_try
+        try! buildExampleUsecase(count: 10)
+
     /// Usecase where there are keys in the range `0..<100` and the values are equal to keys.
     static let hundred: Usecase = // swiftlint:disable:next force_try
-        try! buildExampleUsecase()
+        try! buildExampleUsecase(count: 100)
 
-    private static func buildExampleUsecase() throws -> Usecase {
+    private static func buildExampleUsecase(count: Int) throws -> Usecase {
         typealias ServerType = KeywordPirServer<MulPirServer<Bfv<UInt32>>>
-        let databaseRows = (0..<100)
+        let databaseRows = (0..<count)
             .map { KeywordValuePair(keyword: [UInt8](String($0).utf8), value: [UInt8](String($0).utf8)) }
         let context: Context<ServerType.Scheme> =
             try .init(encryptionParameters: .init(from: .n_4096_logq_27_28_28_logt_4))
