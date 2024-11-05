@@ -1,4 +1,4 @@
-// swift-tools-version: 5.10
+// swift-tools-version: 6.0
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 // Copyright 2024 Apple Inc. and the Swift Homomorphic Encryption project authors
@@ -36,7 +36,7 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-crypto.git", from: "3.5.0"),
         .package(
             url: "git@github.pie.apple.com:SIMLCryptoAndPrivacy/swift-homomorphic-encryption.git",
-            revision: "87104e9cbfe7e9f6559acd44036f3139ba7cb111"),
+            revision: "e279d1934343777994185906f619af8ae978d3b3"),
         .package(url: "https://github.com/apple/swift-protobuf.git", from: "1.27.0"),
         .package(url: "https://github.com/hummingbird-project/hummingbird", from: "2.0.0"),
         .package(url: "https://github.com/hummingbird-project/hummingbird-compression", from: "2.0.0-rc.2"),
@@ -109,6 +109,6 @@ let package = Package(
 #if canImport(Darwin)
 // Set the minimum macOS version for the package
 package.platforms = [
-    .macOS(.v14), // Constrained by Swift 5.10 support for Xcode (https://developer.apple.com/support/xcode/)
+    .macOS(.v15), // Constrained by swift-homomorphic-encryption
 ]
 #endif

@@ -12,12 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if canImport(Darwin)
 import Foundation
-#else
-// Foundation.URL is not Sendable
-@preconcurrency import Foundation
-#endif
 import Hummingbird
 import PrivacyPass
 
@@ -50,11 +45,7 @@ struct PrivacyPassController<UserAuthenticator: UserTokenAuthenticator> {
         }
         // swiftlint:disable:next force_unwrapping
         let issuerRequestUri = URL(string: "/issue")!
-        #if canImport(Darwin)
         return TokenIssuerDirectory(issuerRequestUri: issuerRequestUri, tokenKeys: tokenKeys)
-        #else
-        return await TokenIssuerDirectory(issuerRequestUri: issuerRequestUri, tokenKeys: tokenKeys)
-        #endif
     }
 
     @Sendable
