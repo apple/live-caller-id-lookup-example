@@ -26,6 +26,7 @@ Request        | Value              | Description
 Method         | POST               | HTTP method.
 Path           | `/config`          | HTTP path.
 Header         | `Authorization`    | The value will contain a private access token.
+Header         | `User-Agent`       | Identifier for the user's OS type and version.
 Header         | `User-Identifier`  | Pseudorandom identifier tied to a user.
 Request Body   | `ConfigRequest`    | Serialized Protobuf message that list the use-cases that the system is interested in.
 Response       | `ConfigResponse`   | Serialized Protobuf message. The `ConfigResponse` contains the `configs` and `key_info` response fields.
@@ -43,6 +44,7 @@ Request        | Value              | Description
 Method         | POST               | HTTP method.
 Path           | `/key`             | HTTP path.
 Header         | `Authorization`    | The value will contain a private access token.
+Header         | `User-Agent`       | Identifier for the user's OS type and version.
 Header         | `User-Identifier`  | Pseudorandom identifier tied to a user.
 Body           | `EvaluationKeys`   | Serialized Protobuf message that contains evaluation key(s).
 
@@ -57,6 +59,7 @@ Request        | Value              | Description
 Method         | POST               | HTTP method.
 Path           | `/queries`         | HTTP path.
 Header         | `Authorization`    | The value will contain a private access token.
+Header         | `User-Agent`       | Identifier for the user's OS type and version.
 Header         | `User-Identifier`  | Pseudorandom identifier tied to a user.
 Request Body   | `Requests`         | Serialized Protobuf message.
 Response       | `Responses`        | Serialized Protobuf message.

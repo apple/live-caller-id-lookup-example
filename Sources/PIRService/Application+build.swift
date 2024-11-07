@@ -19,11 +19,13 @@ import Hummingbird
 import Logging
 import NIO
 import PrivateInformationRetrieval
+import Util
 
-struct AppContext: IdentifiedRequestContext, AuthenticatedRequestContext, RequestContext {
+struct AppContext: IdentifiedRequestContext, AuthenticatedRequestContext, PlatformRequestContext, RequestContext {
     var coreContext: CoreRequestContextStorage
     var userIdentifier: UserIdentifier
     var userTier: UserTier
+    var platform: Platform?
 
     // override pload size to 10MiB, the default 2MiB limit is too small for some evaluation keys.
     var maxUploadSize: Int {
@@ -32,6 +34,7 @@ struct AppContext: IdentifiedRequestContext, AuthenticatedRequestContext, Reques
 
     init(source: ApplicationRequestContextSource) {
         self.coreContext = .init(source: source)
+        self.platform = nil
         self.userIdentifier = UserIdentifier(identifier: "")
         self.userTier = .tier1
     }

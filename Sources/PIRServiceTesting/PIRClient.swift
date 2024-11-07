@@ -20,6 +20,7 @@ import PrivacyPass
 import PrivateInformationRetrieval
 import PrivateInformationRetrievalProtobuf
 import SwiftProtobuf
+import Util
 
 /// PIRClient useful for testing `PIRService`.
 public struct PIRClient<PIRClient: IndexPirClient> {
@@ -63,6 +64,8 @@ public struct PIRClient<PIRClient: IndexPirClient> {
 
     /// User identifier.
     public var userID = UUID()
+    /// Platform the device is using.
+    public var platform: Platform
     /// Configuration cache.
     public var configCache: [String: Configuration]
     /// Stored secret keys.
@@ -76,6 +79,7 @@ public struct PIRClient<PIRClient: IndexPirClient> {
     /// - Parameters:
     ///   - connection: Connection to the service under test.
     ///   - userID: User identifier.
+    ///   - platform: Platform the device is using.
     ///   - configCache: Configuration cache.
     ///   - secretKeys: Stored secret keys.
     ///   - tokens: Privacy pass tokens.
@@ -83,6 +87,7 @@ public struct PIRClient<PIRClient: IndexPirClient> {
     public init(
         connection: TestClientProtocol,
         userID: UUID = UUID(),
+        platform: Platform = .iOS18,
         configCache: [String: Configuration] = [:],
         secretKeys: [EvaluationKeyConfigHash: StoredSecretKey] = [:],
         tokens: [Token] = [],
@@ -90,6 +95,7 @@ public struct PIRClient<PIRClient: IndexPirClient> {
     {
         self.connection = connection
         self.userID = userID
+        self.platform = platform
         self.configCache = configCache
         self.secretKeys = secretKeys
         self.tokens = tokens
@@ -136,7 +142,7 @@ public struct PIRClient<PIRClient: IndexPirClient> {
             let client = try keywordPIRClient(for: keyword, config: config, context: context)
             let query = try client.generateQuery(at: keyword, using: secretKey)
             return try Apple_SwiftHomomorphicEncryption_Api_Pir_V1_PIRRequest.with { pirRequest in
-                pirRequest.shardIndex = try UInt32(config.shardindex(for: keyword))
+                pirRequest.shardIndex = try UInt32(config.shardIndex(for: keyword))
                 pirRequest.query = try query.proto()
                 pirRequest.evaluationKeyMetadata = .with { evaluationKeyMetadata in
                     evaluationKeyMetadata.timestamp = storedSecretKey.timestamp
@@ -173,7 +179,7 @@ public struct PIRClient<PIRClient: IndexPirClient> {
         config: Apple_SwiftHomomorphicEncryption_Api_Pir_V1_PIRConfig,
         context: Context<PIRClient.Scheme>) throws -> KeywordPirClient<PIRClient>
     {
-        let shardIndex = try config.shardindex(for: keyword)
+        let shardIndex = try config.shardIndex(for: keyword)
         let shardConfig = config.shardConfig(shardIndex: shardIndex)
         let evaluationKeyConfig = EvaluationKeyConfig()
         return KeywordPirClient<PIRClient>(
@@ -185,8 +191,10 @@ public struct PIRClient<PIRClient: IndexPirClient> {
     }
 
     mutating func post<Response: Message>(path: String, body: some Message) async throws -> Response {
-        var headers = HTTPFields()
-        headers[.userIdentifier] = userID.uuidString
+        var headers: HTTPFields = [
+            .userIdentifier: userID.uuidString,
+            .userAgent: platform.exampleUserAgent,
+        ]
         if userToken != nil {
             if tokens.isEmpty {
                 // Note: actual device behaviour is more complex than just fetching 4 tokens.

@@ -17,6 +17,7 @@ import HomomorphicEncryptionProtobuf
 import Hummingbird
 import PrivateInformationRetrieval
 import PrivateInformationRetrievalProtobuf
+import Util
 
 enum LoadingError: Error {
     case invalidParameters(shard: String, got: String, expected: String)
@@ -97,13 +98,32 @@ struct PirUsecase<PirScheme: IndexPirServer>: Usecase {
     func config() throws -> Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Config {
         var pirConfig = Apple_SwiftHomomorphicEncryption_Api_Pir_V1_PIRConfig()
         pirConfig.encryptionParameters = try context.encryptionParameters.proto()
+        guard let firstShard = shards.first else {
+            throw HTTPError(.internalServerError, message: "Empty shards")
+        }
+
+        pirConfig.keywordPirParams = keywordParams.proto()
+        pirConfig.algorithm = .mulPir
+        pirConfig.batchSize = UInt64(firstShard.indexPirParameter.batchSize)
+        pirConfig.evaluationKeyConfigHash = try evaluationKeyConfig().sha256()
         pirConfig.shardConfigs = shards.map { shard in
             shard.indexPirParameter.proto()
         }
-        pirConfig.keywordPirParams = keywordParams.proto()
-        pirConfig.algorithm = .mulPir
-        pirConfig.batchSize = UInt64(shards.first?.indexPirParameter.batchSize ?? 1)
-        pirConfig.evaluationKeyConfigHash = try evaluationKeyConfig().sha256()
+        let allShardsSame = shards.count > 1 && shards.dropFirst().allSatisfy { shard in
+            shard.indexPirParameter == firstShard.indexPirParameter
+        }
+        if allShardsSame {
+            pirConfig.pirShardConfigs = Apple_SwiftHomomorphicEncryption_Api_Pir_V1_PIRShardConfigs
+                .with { shardConfigs in
+                    shardConfigs.repeatedShardConfig = Apple_SwiftHomomorphicEncryption_Api_Pir_V1_PIRFixedShardConfig
+                        .with { fixedShardConfig in
+                            fixedShardConfig.shardCount = UInt32(shards.count)
+                            fixedShardConfig.shardConfig = firstShard.indexPirParameter.proto()
+                        }
+                }
+            pirConfig.shardConfigs = []
+        }
+
         return try Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Config.with { config in
             config.pirConfig = pirConfig
             config.configID = try pirConfig.sha256()
