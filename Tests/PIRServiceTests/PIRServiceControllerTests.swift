@@ -19,6 +19,7 @@ import HummingbirdTesting
 @testable import PIRService
 import PrivateInformationRetrieval
 import PrivateInformationRetrievalProtobuf
+import Util
 import XCTest
 
 class PIRServiceControllerTests: XCTestCase {
@@ -94,10 +95,65 @@ class PIRServiceControllerTests: XCTestCase {
         }
     }
 
+    func testCachedConfigFetch() async throws {
+        let usecaseStore = UsecaseStore()
+        let exampleUsecase = ExampleUsecase.repeatedShardConfig
+        try await usecaseStore.set(name: "test", usecase: exampleUsecase)
+        let app = try await buildApplication(usecaseStore: usecaseStore)
+        let user = UserIdentifier()
+
+        try await app.test(.live) { client in // swiftlint:disable:this closure_body_length
+            for platform: Platform in [.macOS15, .macOS15_2, .iOS18, .iOS18_2] {
+                // No or wrong existing configId
+                for existingConfigId in [Data(), Data([UInt8(1), 2])] {
+                    let configRequest = Apple_SwiftHomomorphicEncryption_Api_Pir_V1_ConfigRequest.with { configReq in
+                        configReq.usecases = ["test"]
+                        configReq.existingConfigIds = [existingConfigId]
+                    }
+                    try await client.execute(
+                        uri: "/config",
+                        userIdentifier: user,
+                        message: configRequest,
+                        platform: platform)
+                    { response in
+                        XCTAssertEqual(response.status, .ok)
+                        var expectedConfig = try exampleUsecase.config()
+                        expectedConfig.makeCompatible(with: platform)
+                        let configResponse = try response
+                            .message(as: Apple_SwiftHomomorphicEncryption_Api_Pir_V1_ConfigResponse.self)
+                        XCTAssertEqual(configResponse.configs["test"], expectedConfig)
+                        try XCTAssertEqual(configResponse.keyInfo[0].keyConfig, exampleUsecase.evaluationKeyConfig())
+                    }
+                }
+                // Existing configId
+                let configRequestWithConfigId = try Apple_SwiftHomomorphicEncryption_Api_Pir_V1_ConfigRequest
+                    .with { configReq in
+                        configReq.usecases = ["test"]
+                        configReq.existingConfigIds = try [exampleUsecase.config().configID]
+                    }
+                try await client.execute(
+                    uri: "/config",
+                    userIdentifier: user,
+                    message: configRequestWithConfigId,
+                    platform: platform)
+                { response in
+                    XCTAssertEqual(response.status, .ok)
+                    let configResponse = try response
+                        .message(as: Apple_SwiftHomomorphicEncryption_Api_Pir_V1_ConfigResponse.self)
+                    XCTAssertEqual(configResponse.configs["test"]?.reuseExistingConfig, true)
+                    XCTAssertEqual(
+                        configResponse.configs["test"]?.pirConfig,
+                        Apple_SwiftHomomorphicEncryption_Api_Pir_V1_PIRConfig())
+                    try XCTAssertEqual(configResponse.keyInfo[0].keyConfig, exampleUsecase.evaluationKeyConfig())
+                }
+            }
+        }
+    }
+
     func testCompressedConfigFetch() async throws {
         // Mock usecase that has a large config with 10K randomized shardConfigs.
         struct TestUseCaseWithLargeConfig: Usecase {
-            init() {
+            init() throws {
                 let shardConfigs = (0..<10000).map { _ in
                     Apple_SwiftHomomorphicEncryption_Api_Pir_V1_PIRShardConfig.with { shardConfig in
                         shardConfig.numEntries = UInt64.random(in: 0..<1000)
@@ -106,10 +162,12 @@ class PIRServiceControllerTests: XCTestCase {
                     }
                 }
 
-                self.randomConfig = Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Config.with { config in
-                    config.pirConfig = .with { pirConfig in
-                        pirConfig.shardConfigs = shardConfigs
-                    }
+                let pirConfg = Apple_SwiftHomomorphicEncryption_Api_Pir_V1_PIRConfig.with { pirConfig in
+                    pirConfig.shardConfigs = shardConfigs
+                }
+                self.randomConfig = try Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Config.with { config in
+                    config.pirConfig = pirConfg
+                    config.configID = try pirConfg.sha256()
                 }
             }
 
@@ -133,7 +191,7 @@ class PIRServiceControllerTests: XCTestCase {
         }
 
         let usecaseStore = UsecaseStore()
-        let exampleUsecase = TestUseCaseWithLargeConfig()
+        let exampleUsecase = try TestUseCaseWithLargeConfig()
         try await usecaseStore.set(name: "test", usecase: exampleUsecase)
 
         let app = try await buildApplication(usecaseStore: usecaseStore)

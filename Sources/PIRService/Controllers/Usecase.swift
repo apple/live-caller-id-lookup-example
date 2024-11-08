@@ -29,3 +29,15 @@ protocol Usecase: Sendable {
         evaluationKey: Apple_SwiftHomomorphicEncryption_Api_Shared_V1_EvaluationKey) async throws
         -> Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Response
 }
+
+extension Usecase {
+    func config(existingConfigId: [UInt8]) throws -> Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Config {
+        let config = try config()
+        if Array(config.configID) == existingConfigId {
+            return Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Config.with { apiConfig in
+                apiConfig.reuseExistingConfig = true
+            }
+        }
+        return config
+    }
+}
