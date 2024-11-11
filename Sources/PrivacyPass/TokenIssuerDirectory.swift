@@ -12,12 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#if canImport(Darwin)
 import Foundation
-#else
-// Foundation.URL is not Sendable
-@preconcurrency import Foundation
-#endif
 
 /// Token issuer directory hold the list of all public keys supported by the issuer.
 ///
