@@ -29,7 +29,10 @@ Header         | `Authorization`    | The value will contain a private access to
 Header         | `User-Agent`       | Identifier for the user's OS type and version.
 Header         | `User-Identifier`  | Pseudorandom identifier tied to a user.
 Request Body   | `ConfigRequest`    | Serialized Protobuf message that list the use-cases that the system is interested in.
+                                      As of iOS 18.2, the client will set the `existing_config_ids` field.
 Response       | `ConfigResponse`   | Serialized Protobuf message. The `ConfigResponse` contains the `configs` and `key_info` response fields.
+                                      As of iOS 18.2, the message may set `reuse_existing_config: true` instead of the `pirConfig` field, reducing the message size.
+                                      This indicates the client should use the config with id specified in `existing_config_ids`.
 Response field | `configs`          | Map from use case names to the corresponding configuration.
 Response field | `key_info`         | List of `KeyStatus` objects.
 
