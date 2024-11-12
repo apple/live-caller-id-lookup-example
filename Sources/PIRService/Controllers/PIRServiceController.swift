@@ -82,7 +82,7 @@ struct PIRServiceController {
             if let usecase = requestedUsecases[usecaseName] {
                 var config = try usecase.config(existingConfigId: Array(configId))
                 if let platform = context.platform {
-                    config.makeCompatible(with: platform)
+                    try config.makeCompatible(with: platform)
                 }
                 configs[usecaseName] = config
             }
