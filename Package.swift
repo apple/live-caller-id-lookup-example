@@ -47,7 +47,7 @@ let package = Package(
         .executableTarget(
             name: "PIRService",
             dependencies: [
-                "PrivacyPass",
+                "PrivacyPass", "Util",
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "Crypto", package: "swift-crypto"),
                 .product(name: "HomomorphicEncryptionProtobuf", package: "swift-homomorphic-encryption"),
@@ -78,11 +78,13 @@ let package = Package(
         .target(
             name: "PrivacyPass",
             dependencies: [
+                "Util",
                 .product(name: "Crypto", package: "swift-crypto"),
                 .product(name: "SwiftASN1", package: "swift-asn1"),
                 .product(name: "_CryptoExtras", package: "swift-crypto"),
             ],
             swiftSettings: swiftSettings),
+        .target(name: "Util", swiftSettings: swiftSettings),
         .testTarget(
             name: "PrivacyPassTests",
             dependencies: [
@@ -98,11 +100,15 @@ let package = Package(
         .target(
             name: "PIRServiceTesting",
             dependencies: [
-                "PrivacyPass",
+                "PrivacyPass", "Util",
                 .product(name: "HomomorphicEncryptionProtobuf", package: "swift-homomorphic-encryption"),
                 .product(name: "HummingbirdTesting", package: "hummingbird"),
                 .product(name: "PrivateInformationRetrievalProtobuf", package: "swift-homomorphic-encryption"),
             ],
+            swiftSettings: swiftSettings),
+        .testTarget(
+            name: "UtilTests",
+            dependencies: ["Util"],
             swiftSettings: swiftSettings),
     ])
 

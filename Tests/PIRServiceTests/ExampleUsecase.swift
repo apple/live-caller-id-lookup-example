@@ -25,6 +25,11 @@ enum ExampleUsecase {
     static let hundred: Usecase = // swiftlint:disable:next force_try
         try! buildExampleUsecase(count: 100)
 
+    /// Usecase where there are keys in the range `0..<100` and the values are equal to keys.
+    /// Each shard configuration is the same
+    static let repeatedShardConfig: Usecase = // swiftlint:disable:next force_try
+        try! buildRepeatedShardConfigsUsecase(count: 100)
+
     private static func buildExampleUsecase(count: Int) throws -> Usecase {
         typealias ServerType = KeywordPirServer<MulPirServer<Bfv<UInt32>>>
         let databaseRows = (0..<count)
@@ -41,5 +46,36 @@ enum ExampleUsecase {
             with: context)
         let shard = try ServerType(context: context, processed: processed)
         return PirUsecase(context: context, keywordParams: config.parameter, shards: [shard])
+    }
+
+    private static func buildRepeatedShardConfigsUsecase(count: Int) throws -> Usecase {
+        typealias ServerType = KeywordPirServer<MulPirServer<Bfv<UInt32>>>
+
+        let context: Context<ServerType.Scheme> =
+            try .init(encryptionParameters: .init(from: .n_4096_logq_27_28_28_logt_4))
+        let cuckooTableConfig = try CuckooTableConfig(
+            hashFunctionCount: 2,
+            maxEvictionCount: 100,
+            maxSerializedBucketSize: context.bytesPerPlaintext,
+            bucketCount: .fixedSize(bucketCount: 10))
+        let config = try KeywordPirConfig(
+            dimensionCount: 2,
+            cuckooTableConfig: cuckooTableConfig,
+            unevenDimensions: false, keyCompression: .noCompression)
+
+        let databaseRows = (0..<count)
+            .map { KeywordValuePair(keyword: [UInt8](String($0).utf8), value: [UInt8](String($0).utf8)) }
+        let database = try KeywordDatabase(rows: databaseRows, sharding: .shardCount(5))
+        let shards = try database.shards.values.map { _ in
+            let processed = try ServerType.process(
+                database: databaseRows,
+                config: config,
+                with: context)
+            return try ServerType(context: context, processed: processed)
+        }
+        let indexPirParameter = shards[0].indexPirParameter
+        precondition(shards.allSatisfy { $0.indexPirParameter == indexPirParameter })
+
+        return PirUsecase(context: context, keywordParams: config.parameter, shards: shards)
     }
 }

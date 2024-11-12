@@ -17,6 +17,7 @@ import HomomorphicEncryptionProtobuf
 import Hummingbird
 import HummingbirdCompression
 import PrivateInformationRetrievalProtobuf
+import Util
 
 struct PIRServiceController {
     let usecases: UsecaseStore
@@ -28,8 +29,10 @@ struct PIRServiceController {
 
     func addRoutes(to group: RouterGroup<AppContext>) {
         group.add(middleware: ExtractUserIdentifierMiddleware())
+            .add(middleware: ExtractPlatformMiddleware())
             .post("/key", use: key)
             .post("/queries", use: queries)
+            // only `config` uses response compression, since the key and queries are not compressible.
             .add(middleware: ResponseCompressionMiddleware())
             .post("/config", use: config)
     }
@@ -63,7 +66,11 @@ struct PIRServiceController {
         }
 
         let configs = try requestedUsecases.mapValues { usecase in
-            try usecase.config()
+            var config = try usecase.config()
+            if let platform = context.platform {
+                config.makeCompatible(with: platform)
+            }
+            return config
         }
 
         let keyConfigs = try requestedUsecases.values.map { try $0.evaluationKeyConfig() }

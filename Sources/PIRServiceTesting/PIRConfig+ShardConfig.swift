@@ -14,8 +14,10 @@
 
 import PrivateInformationRetrieval
 import PrivateInformationRetrievalProtobuf
+import Util
 
-extension Apple_SwiftHomomorphicEncryption_Api_Pir_V1_PIRConfig {
+public extension Apple_SwiftHomomorphicEncryption_Api_Pir_V1_PIRConfig {
+    /// The number of shards in the configuration.
     var shardCount: Int {
         if let pirShardConfigs = pirShardConfigs.shardConfigs {
             switch pirShardConfigs {
@@ -26,6 +28,9 @@ extension Apple_SwiftHomomorphicEncryption_Api_Pir_V1_PIRConfig {
         return shardConfigs.count
     }
 
+    /// Returns the shard configuration at an index.
+    /// - Parameter shardIndex: Shard index.
+    /// - Returns: The shard configuration.
     func shardConfig(shardIndex: Int) -> Apple_SwiftHomomorphicEncryption_Api_Pir_V1_PIRShardConfig {
         if let pirShardConfigs = pirShardConfigs.shardConfigs {
             switch pirShardConfigs {
@@ -36,7 +41,10 @@ extension Apple_SwiftHomomorphicEncryption_Api_Pir_V1_PIRConfig {
         return shardConfigs[shardIndex]
     }
 
-    func shardindex(for keyword: KeywordValuePair.Keyword) throws -> Int {
+    /// Computes the shard index for a keyword.
+    /// - Parameter keyword: Keyword.
+    /// - Returns: The shard index for the keyword.
+    func shardIndex(for keyword: KeywordValuePair.Keyword) throws -> Int {
         if keywordPirParams.hasShardingFunction {
             switch keywordPirParams.shardingFunction.function {
             case .sha256:
