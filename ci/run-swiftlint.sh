@@ -2,7 +2,7 @@
 
 function install_swiftlint {
     echo "installing swiftlint"
-    SWIFTLINT_VERSION="0.54.0"
+    SWIFTLINT_VERSION="0.57.0"
     DIR=$PWD
     mkdir -p /tmp/swiftlint
     cd /tmp/swiftlint || exit 1

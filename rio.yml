@@ -15,7 +15,7 @@
 schemaVersion: 2.0
 machine:
   # https://sdp.apple.com/docs/base-images/container-images/builder-images
-  baseImage: docker.apple.com/base-images/ubi9/swiftnightly-6.0-builder
+  baseImage: docker.apple.com/base-images/ubi9/swift6.0-builder
 notify:
   pullRequestComment:
     postOnSuccess: false

@@ -2,7 +2,7 @@
 
 function install_swiftformat {
     echo "installing swiftformat"
-    SWIFTFORMAT_VERSION="0.53.8"
+    SWIFTFORMAT_VERSION="0.54.6"
     DIR=$PWD
     mkdir -p /tmp/swiftformat
     cd /tmp/swiftformat || exit 1
