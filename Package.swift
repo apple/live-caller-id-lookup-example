@@ -86,7 +86,10 @@ let package = Package(
                 .product(name: "Crypto", package: "swift-crypto"),
                 .product(name: "_CryptoExtras", package: "swift-crypto"),
             ],
-            exclude: ["TestVectors/PrivacyPassPublicTokens.json"],
+            exclude: [
+                "TestVectors/PrivacyPassPublicTokens.json",
+                "TestVectors/PrivacyPassChallengeAndRedemptionStructure.json",
+            ],
             swiftSettings: swiftSettings),
     ])
 

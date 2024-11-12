@@ -18,8 +18,20 @@ import Crypto
 public extension PublicKey {
     /// Prepare a token request.
     /// - Parameter challenge: Token challenge.
-    /// - Returns: Returns a ``PreparedRequest`` that can be converted to a token request and after obtaining a token
-    /// response can be converted to a token.
+    /// - Returns: A ``PreparedRequest`` that can be converted to a token request and, after obtaining a token
+    /// response, can be converted to a token.
+    /// - seealso: [RFC 9578: Client-to-Issuer
+    /// Request](https://www.rfc-editor.org/rfc/rfc9578#name-client-to-issuer-request-2)
+    func request(challenge: TokenChallenge) throws
+        -> PrivacyPass.PreparedRequest
+    {
+        try request(challenge: challenge.bytes())
+    }
+
+    /// Prepare a token request.
+    /// - Parameter challenge: Token challenge.
+    /// - Returns: A ``PreparedRequest`` that can be converted to a token request and, after obtaining a token
+    /// response, can be converted to a token.
     /// - seealso: [RFC 9578: Client-to-Issuer
     /// Request](https://www.rfc-editor.org/rfc/rfc9578#name-client-to-issuer-request-2)
     func request(challenge: [UInt8]) throws
