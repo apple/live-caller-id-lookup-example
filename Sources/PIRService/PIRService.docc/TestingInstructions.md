@@ -261,6 +261,11 @@ By default `PIRService` will start listening on the loopback interface, but you 
 make it listen on all network interfaces. The default port is `8080`, but it can be changed by using the `--port`
 option.
 
+### Features
+After introduction in iOS 18.0, `Live Caller ID Lookup` introduced further features.
+
+* `Fixed PIR Shard Config` (iOS 18.2). When all shard configurations are identical, `PIR Fixed Shard Config` allows for a more compact PIR config, saving bandwidth and client-side memory usage. To enable, set the `pirShardConfigs` field in the PIR config. iOS clients prior to iOS 18.2 will still require the `shardConfigs` field to be set. See [Reusing PIR Parameters]( https://swiftpackageindex.com/apple/swift-homomorphic-encryption/main/documentation/privateinformationretrieval/reusingpirparameters) for how to process the database such that all shard configurations are identical.
+
 ## Writing the application extension
 
 > Important: Please see [Getting up-to-date calling and blocking information for your

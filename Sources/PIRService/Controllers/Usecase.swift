@@ -14,8 +14,14 @@
 
 import HomomorphicEncryptionProtobuf
 import PrivateInformationRetrievalProtobuf
+import Util
 
 protocol Usecase: Sendable {
+    /// Returns the configuration.
+    ///
+    /// Note: may use features that are not compatible with older platforms.
+    /// ``Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Config/makeCompatible(with:)`` can be used to make the
+    /// configuration compatible with older platforms.
     func config() throws -> Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Config
     func evaluationKeyConfig() throws -> Apple_SwiftHomomorphicEncryption_V1_EvaluationKeyConfig
     func process(

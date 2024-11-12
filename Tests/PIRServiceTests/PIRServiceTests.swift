@@ -16,6 +16,7 @@ import HomomorphicEncryption
 @testable import PIRService
 import PIRServiceTesting
 import PrivateInformationRetrieval
+import Util
 import XCTest
 
 class PIRServiceTests: XCTestCase {
@@ -110,6 +111,43 @@ class PIRServiceTests: XCTestCase {
                 XCTFail("Previous loop should fail")
             } catch {}
         }
+    }
+
+    func testRepeatedShardConfigs() async throws {
+        let usecaseStore = UsecaseStore()
+        try await usecaseStore.set(name: "test", usecase: ExampleUsecase.repeatedShardConfig)
+        let app = try await buildApplication(usecaseStore: usecaseStore)
+        for platform: Platform in [.macOS15, .macOS15_2, .iOS18, .iOS18_2] {
+            try await app.test(.live) { client in
+                var pirClient = PIRClient<MulPirClient<Bfv<UInt32>>>(connection: client, platform: platform)
+                var queriedShards: Set<Int> = []
+                for index in [0, 1] {
+                    let keyword = String(index)
+                    let result = try await pirClient.request(keyword: keyword)
+                    XCTAssertEqual(result, keyword)
+                    let shardIndex = try XCTUnwrap(pirClient.configCache["test"]?.config
+                        .shardIndex(for: Array(keyword.utf8)))
+                    queriedShards.insert(shardIndex)
+                }
+                XCTAssert(queriedShards.count > 1)
+            }
+        }
+    }
+
+    func testPirConfigExtensions() throws {
+        var config = try ExampleUsecase.repeatedShardConfig.config()
+        XCTAssertEqual(config.pirConfig.shardConfigs.count, 0)
+        XCTAssertEqual(config.pirConfig.pirShardConfigs.repeatedShardConfig.shardCount, 5)
+        let shard0Config = config.pirConfig.shardConfig(shardIndex: 0)
+        XCTAssertEqual(config.pirConfig.shardCount, 5)
+
+        config.makeCompatible(with: .iOS18)
+        XCTAssertEqual(config.pirConfig.shardConfigs.count, 5)
+        XCTAssertEqual(config.pirConfig.shardConfigs, Array(repeating: shard0Config, count: 5))
+        for shardIndex in 0..<5 {
+            XCTAssertEqual(config.pirConfig.shardConfig(shardIndex: shardIndex), shard0Config)
+        }
+        XCTAssertEqual(config.pirConfig.shardCount, 5)
     }
 }
 

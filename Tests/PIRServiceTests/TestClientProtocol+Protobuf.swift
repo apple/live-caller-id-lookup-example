@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import HTTPTypes
 import Hummingbird
 import HummingbirdTesting
 @testable import PIRService
 import PIRServiceTesting
 import SwiftProtobuf
+import Util
 import XCTest
 
 public extension TestClientProtocol {
@@ -26,13 +28,18 @@ public extension TestClientProtocol {
         userIdentifier: UserIdentifier,
         message: some Message,
         acceptCompression: Bool = false,
+        platform: Platform = .iOS18,
         testCallback: @escaping (TestResponse) async throws -> Return = { $0 }) async throws -> Return
     {
         let bodyBuffer = try ByteBuffer(data: message.serializedData())
-        var headers: HTTPFields = [.userIdentifier: userIdentifier.identifier]
+        var headers: HTTPFields = [
+            .userIdentifier: userIdentifier.identifier,
+            .userAgent: platform.exampleUserAgent,
+        ]
         if acceptCompression {
             headers[.acceptEncoding] = "gzip"
         }
+
         let response = try await executeRequest(uri: uri, method: .post, headers: headers, body: bodyBuffer)
         return try await testCallback(response)
     }
