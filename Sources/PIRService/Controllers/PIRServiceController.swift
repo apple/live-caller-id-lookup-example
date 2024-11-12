@@ -65,12 +65,27 @@ struct PIRServiceController {
             await usecases.get(names: configRequest.usecases)
         }
 
-        let configs = try requestedUsecases.mapValues { usecase in
-            var config = try usecase.config()
-            if let platform = context.platform {
-                config.makeCompatible(with: platform)
+        guard configRequest.existingConfigIds.isEmpty ||
+            configRequest.existingConfigIds.count == requestedUsecases.count
+        else {
+            throw HTTPError(.badRequest, message: """
+                Invalid existingConfigIds count \(configRequest.existingConfigIds.count). \
+                Expected 0 or \(requestedUsecases.count).
+                """)
+        }
+
+        let existingConfigIds = configRequest.existingConfigIds.isEmpty ? Array(
+            repeating: Data(),
+            count: requestedUsecases.count) : configRequest.existingConfigIds
+        var configs = [String: Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Config]()
+        for (usecaseName, configId) in zip(requestedUsecases.keys, existingConfigIds) {
+            if let usecase = requestedUsecases[usecaseName] {
+                var config = try usecase.config(existingConfigId: Array(configId))
+                if let platform = context.platform {
+                    config.makeCompatible(with: platform)
+                }
+                configs[usecaseName] = config
             }
-            return config
         }
 
         let keyConfigs = try requestedUsecases.values.map { try $0.evaluationKeyConfig() }
@@ -81,6 +96,7 @@ struct PIRServiceController {
                 key: key,
                 as: Protobuf<Apple_SwiftHomomorphicEncryption_Api_Shared_V1_EvaluationKey>.self)
             return Apple_SwiftHomomorphicEncryption_Api_Shared_V1_KeyStatus.with { keyStatus in
+                // A timestamp of 0 indicates the evaluation key does not exist on the server
                 keyStatus.timestamp = storedEvaluationKey?.message.metadata.timestamp ?? 0
                 keyStatus.keyConfig = keyConfig
             }

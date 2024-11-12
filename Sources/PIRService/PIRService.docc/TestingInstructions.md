@@ -266,6 +266,8 @@ After introduction in iOS 18.0, `Live Caller ID Lookup` introduced further featu
 
 * `Fixed PIR Shard Config` (iOS 18.2). When all shard configurations are identical, `PIR Fixed Shard Config` allows for a more compact PIR config, saving bandwidth and client-side memory usage. To enable, set the `pirShardConfigs` field in the PIR config. iOS clients prior to iOS 18.2 will still require the `shardConfigs` field to be set. See [Reusing PIR Parameters]( https://swiftpackageindex.com/apple/swift-homomorphic-encryption/main/documentation/privateinformationretrieval/reusingpirparameters) for how to process the database such that all shard configurations are identical.
 
+* `Reusing existing config id` (iOS 18.2). During the `config` request, if a client has a cached configuration, it will send the config id of that cached configuration. Then, if the configuration is unchanged, the server may respond with a config setting `reuseExistingConfig = true` and omit any other fields. This helps reduce the response size for the config fetch.
+
 ## Writing the application extension
 
 > Important: Please see [Getting up-to-date calling and blocking information for your
