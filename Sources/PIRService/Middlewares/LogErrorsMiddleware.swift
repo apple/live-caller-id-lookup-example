@@ -12,22 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-actor UserAuthenticator: UserTokenAuthenticator, Sendable {
-    var allowList: [String: UserTier]
+import Hummingbird
 
-    init() {
-        self.allowList = [:]
-    }
-
-    func add(token: String, tier: UserTier) {
-        allowList[token] = tier
-    }
-
-    func authenticate(userToken: String) async throws -> UserTier? {
-        allowList[userToken]
-    }
-
-    func update(allowList: [String: UserTier]) {
-        self.allowList = allowList
+struct LogErrorsMiddleware<Context: RequestContext>: RouterMiddleware {
+    func handle(
+        _ input: HummingbirdCore.Request,
+        context: Context,
+        next: (HummingbirdCore.Request, Context) async throws -> HummingbirdCore
+            .Response) async throws -> HummingbirdCore.Response
+    {
+        do {
+            return try await next(input, context)
+        } catch let error as HTTPError {
+            context.logger.error("\(error)")
+            throw error
+        } catch {
+            context.logger.error("\(error.localizedDescription)")
+            throw error
+        }
     }
 }

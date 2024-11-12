@@ -104,7 +104,10 @@ struct PirUsecase<PirScheme: IndexPirServer>: Usecase {
         pirConfig.algorithm = .mulPir
         pirConfig.batchSize = UInt64(shards.first?.indexPirParameter.batchSize ?? 1)
         pirConfig.evaluationKeyConfigHash = try evaluationKeyConfig().sha256()
-        return Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Config.with { $0.pirConfig = pirConfig }
+        return try Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Config.with { config in
+            config.pirConfig = pirConfig
+            config.configID = try pirConfig.sha256()
+        }
     }
 
     func evaluationKeyConfig() throws -> Apple_SwiftHomomorphicEncryption_V1_EvaluationKeyConfig {
