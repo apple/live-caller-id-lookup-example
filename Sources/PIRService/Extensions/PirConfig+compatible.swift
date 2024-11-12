@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import Hummingbird
 import PrivateInformationRetrievalProtobuf
 import Util
 
@@ -26,12 +27,23 @@ extension Platform {
             fatalError("Unsupported platform \(self)")
         }
     }
+
+    var supportsShardingFunctionDoubleMod: Bool {
+        switch osType {
+        case .iOS:
+            osVersion >= .init(major: 18, minor: 2)
+        case .macOS:
+            osVersion >= .init(major: 15, minor: 2)
+        default:
+            fatalError("Unsupported platform \(self)")
+        }
+    }
 }
 
 public extension Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Config {
     /// Makes the configuration compatible with the given platform.
     /// - Parameter platform: Device platform.
-    mutating func makeCompatible(with platform: Platform) {
+    mutating func makeCompatible(with platform: Platform) throws {
         if !platform.supportsPirFixedShardConfig {
             // Check for PIRFixedShardConfig, introduced in iOS 18.2
             switch pirConfig.pirShardConfigs.shardConfigs {
@@ -42,6 +54,14 @@ public extension Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Config {
                 pirConfig.clearPirShardConfigs()
             case .none:
                 break
+            }
+        }
+
+        if !platform.supportsShardingFunctionDoubleMod {
+            if pirConfig.keywordPirParams.shardingFunction.native() != .sha256 {
+                throw HTTPError(
+                    .internalServerError,
+                    message: "Platform \(platform) does not support sharding functions other than SHA256.")
             }
         }
     }

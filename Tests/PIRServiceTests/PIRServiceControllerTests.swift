@@ -118,7 +118,7 @@ class PIRServiceControllerTests: XCTestCase {
                     { response in
                         XCTAssertEqual(response.status, .ok)
                         var expectedConfig = try exampleUsecase.config()
-                        expectedConfig.makeCompatible(with: platform)
+                        try expectedConfig.makeCompatible(with: platform)
                         let configResponse = try response
                             .message(as: Apple_SwiftHomomorphicEncryption_Api_Pir_V1_ConfigResponse.self)
                         XCTAssertEqual(configResponse.configs["test"], expectedConfig)
