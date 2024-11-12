@@ -141,13 +141,20 @@ class PIRServiceTests: XCTestCase {
         let shard0Config = config.pirConfig.shardConfig(shardIndex: 0)
         XCTAssertEqual(config.pirConfig.shardCount, 5)
 
-        config.makeCompatible(with: .iOS18)
+        try config.makeCompatible(with: .iOS18)
         XCTAssertEqual(config.pirConfig.shardConfigs.count, 5)
         XCTAssertEqual(config.pirConfig.shardConfigs, Array(repeating: shard0Config, count: 5))
         for shardIndex in 0..<5 {
             XCTAssertEqual(config.pirConfig.shardConfig(shardIndex: shardIndex), shard0Config)
         }
         XCTAssertEqual(config.pirConfig.shardCount, 5)
+
+        config.pirConfig.keywordPirParams.shardingFunction.function = .doubleMod(.with { doubleMod in
+            doubleMod.otherShardCount = 5
+        })
+
+        XCTAssertThrowsError(try config.makeCompatible(with: .iOS18))
+        XCTAssertNoThrow(try config.makeCompatible(with: .iOS18_2))
     }
 }
 
