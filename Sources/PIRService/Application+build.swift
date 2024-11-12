@@ -27,7 +27,7 @@ struct AppContext: IdentifiedRequestContext, AuthenticatedRequestContext, Platfo
     var userTier: UserTier
     var platform: Platform?
 
-    // override pload size to 10MiB, the default 2MiB limit is too small for some evaluation keys.
+    // override upload size to 10MiB, the default 2MiB limit is too small for some evaluation keys.
     var maxUploadSize: Int {
         10 * 1024 * 1024
     }
