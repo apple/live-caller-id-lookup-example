@@ -206,18 +206,13 @@ Copy the following to a file called `service-config.json`.
 {
   "users": [
     {
-      "tier1": {}
+      "tier": "tier1",
+      "tokens": ["AAAA"]
     },
-    [
-      "AAAA"
-    ],
     {
-      "tier2": {}
-    },
-    [
-      "BBBB",
-      "CCCC"
-    ]
+      "tier": "tier2",
+      "tokens": ["BBBB", "CCCC"]
+    }
   ],
   "usecases": [
     {
