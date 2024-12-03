@@ -166,7 +166,7 @@ PIRProcessDatabase block-config.json
 ```
 
 This instructs the `PIRProcessDatabase` utility to load the input from `block.binpb`, output the processed database into
-a file called `block-0.bin`. See how the occurances of `SHARD_ID` get replaced in `block-SHARD_ID.bin` to become the
+a file called `block-0.bin`. See how the occurrences of `SHARD_ID` get replaced in `block-SHARD_ID.bin` to become the
 first (and only) shard in our case with name `block-0.binpb`. In addition to the processed database, the utility also
 outputs a file called `block-0.params.txtpb`. This file holds the PIR parameters for the shard.
 
