@@ -15,7 +15,7 @@
 import HTTPTypes
 import Hummingbird
 
-enum UserTier: Equatable, CaseIterable, Hashable, Codable {
+enum UserTier: String, Equatable, CaseIterable, Hashable, Codable {
     case tier1
     case tier2
     case tier3
