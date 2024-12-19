@@ -14,9 +14,9 @@ that different level of details can be provided based on the user tier.
 ![Authentication flow diagram](authentication.png)
 
 1. Authentication server shares the public keys with PIR compute nodes. (Optional)
-2. Application autenticates with the authentication server using regular authentication flow.
+2. Application authenticates with the authentication server using regular authentication flow.
 3. Authentication server returns a User Token. This is a long lived HTTP Bearer token for the user.
-4. Applicaton registers the User Token with the system.
+4. Application registers the User Token with the system.
 5. When a PrivacyPass token needs to be fetched, the system first asks the authentication server for the Token Issuer
    Directory that contains a list of public keys. To minimize the chance of authentication server giving out different
    public keys to different clients the clients fetch the Token Issuer Directory from a proxy server.
@@ -28,7 +28,7 @@ that different level of details can be provided based on the user tier.
    current time.
 9. The system constructs a Privacy Pass token request using the specific public key. The token request is sent along
    with the User Token to the authentication server.
-10. Authententication server verifies that:
+10. Authentication server verifies that:
     * HTTP Bearer token is valid,
     * the token request uses the public key that is associated with the right user tier,
 
