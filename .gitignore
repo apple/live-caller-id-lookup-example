@@ -3,6 +3,7 @@
 .DS_Store
 .benchmarkBaselines/
 .build/
+.index-build/
 .swiftpm
 .vscode/
 xcuserdata/

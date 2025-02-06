@@ -1,4 +1,4 @@
-# Copyright 2024 Apple Inc. and the Swift Homomorphic Encryption project authors
+# Copyright 2024-2025 Apple Inc. and the Swift Homomorphic Encryption project authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,8 +38,20 @@ pipelines:
     steps:
       - pip install pre-commit
       # CI will commit to `main`
-      # swiftformat & swiftlint tested separately
-      - SKIP=no-commit-to-branch,swiftformat,swiftlint pre-commit run --all-files
+      # swiftformat, swiftlint, insert-license tested separately
+      - >
+        SKIP=no-commit-to-branch,swiftformat,swiftlint,insert-license
+        pre-commit run --all-files
+- group: insert-license
+  branchRules:
+    includePatterns:
+    - main
+    - release/.*
+  build:
+    template: freestyle:v4:prb
+    steps:
+      - pip install pre-commit
+      - pre-commit run insert-license --files $(git diff ${GIT_PR_TARGET_COMMIT} --name-only)
 - group: lint
   branchRules:
     includePatterns:
