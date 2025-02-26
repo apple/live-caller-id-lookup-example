@@ -1,5 +1,5 @@
 {
-  "originHash" : "0f53c1d5dccc2e0525c29f955c8c8c28ab09b47b7d49bfa0042a8b1b19630b65",
+  "originHash" : "2270431a7a88f3ef103cc7827183d2dda9529196b2eb8884474079e5e64b2835",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -96,8 +96,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-crypto.git",
       "state" : {
-        "revision" : "06dc63c6d8da54ee11ceb268cde1fa68161afc96",
-        "version" : "3.9.1"
+        "revision" : "b828ba476ab068f0b00d6b41f92f364961b0f323",
+        "version" : "3.10.2"
       }
     },
     {
@@ -132,7 +132,7 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.pie.apple.com:SIMLCryptoAndPrivacy/swift-homomorphic-encryption.git",
       "state" : {
-        "revision" : "e279d1934343777994185906f619af8ae978d3b3"
+        "revision" : "28a319c7dbe47337ba10dba3d1888416cd2db2ce"
       }
     },
     {

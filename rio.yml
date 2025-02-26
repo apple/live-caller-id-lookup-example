@@ -28,6 +28,7 @@ pipelines:
   build:
     template: freestyle:v4:prb
     steps:
+      - swift build --configuration release --all-targets
       - swift test --configuration release --parallel
 - group: pre-commit
   branchRules:
