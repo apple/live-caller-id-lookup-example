@@ -1,4 +1,4 @@
-// Copyright 2024 Apple Inc. and the Swift Homomorphic Encryption project authors
+// Copyright 2024-2025 Apple Inc. and the Swift Homomorphic Encryption project authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -59,9 +59,8 @@ public extension Apple_SwiftHomomorphicEncryption_Api_Pir_V1_Config {
 
         if !platform.supportsShardingFunctionDoubleMod {
             if pirConfig.keywordPirParams.shardingFunction.native() != .sha256 {
-                throw HTTPError(
-                    .internalServerError,
-                    message: "Platform \(platform) does not support sharding functions other than SHA256.")
+                throw HTTPError(.internalServerError,
+                                message: "Platform \(platform) does not support sharding functions other than SHA256.")
             }
         }
     }

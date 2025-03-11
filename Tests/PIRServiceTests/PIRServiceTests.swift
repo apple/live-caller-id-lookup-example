@@ -1,4 +1,4 @@
-// Copyright 2024 Apple Inc. and the Swift Homomorphic Encryption project authors
+// Copyright 2024-2025 Apple Inc. and the Swift Homomorphic Encryption project authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,14 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import Foundation
 import HomomorphicEncryption
+import Hummingbird
 @testable import PIRService
-import PIRServiceTesting
+@testable import PIRServiceTesting
 import PrivateInformationRetrieval
+import Testing
 import Util
-import XCTest
 
-class PIRServiceTests: XCTestCase {
+@Suite
+struct PIRServiceTests {
+    @Test
     func testRequest() async throws {
         let usecaseStore = UsecaseStore()
         try await usecaseStore.set(name: "test", usecase: ExampleUsecase.hundred)
@@ -27,10 +31,11 @@ class PIRServiceTests: XCTestCase {
         try await app.test(.live) { client in
             var pirClient = PIRClient<MulPirClient<Bfv<UInt32>>>(connection: client)
             let result = try await pirClient.request(keyword: "23")
-            XCTAssertEqual(result, "23")
+            #expect(result == "23")
         }
     }
 
+    @Test
     func testRequestWithPrivacyPass() async throws {
         let usecaseStore = UsecaseStore()
         try await usecaseStore.set(name: "test", usecase: ExampleUsecase.hundred)
@@ -41,21 +46,22 @@ class PIRServiceTests: XCTestCase {
         try await app.test(.live) { client in
             var pirClient = PIRClient<MulPirClient<Bfv<UInt32>>>(connection: client, userToken: "ABCD")
             let result = try await pirClient.request(keyword: "23")
-            XCTAssertEqual(result, "23")
+            #expect(result == "23")
         }
     }
 
+    @Test
     func testRoutingToDifferentVersion() async throws {
         let usecaseStore = UsecaseStore()
         // make sure that the configs for these two are different
-        XCTAssertNotEqual(try ExampleUsecase.ten.config(), try ExampleUsecase.hundred.config())
+        #expect(try ExampleUsecase.ten.config() != (ExampleUsecase.hundred.config()))
         try await usecaseStore.set(name: "test", usecase: ExampleUsecase.hundred)
         let app = try await buildApplication(usecaseStore: usecaseStore)
         try await app.test(.live) { client in
             // make a request
             var clientWithOldConfig = PIRClient<MulPirClient<Bfv<UInt32>>>(connection: client)
             var result = try await clientWithOldConfig.request(keyword: "23")
-            XCTAssertEqual(result, "23")
+            #expect(result == "23")
 
             // update the usecase to only have 10 keywords
             try await usecaseStore.set(name: "test", usecase: ExampleUsecase.ten)
@@ -63,23 +69,29 @@ class PIRServiceTests: XCTestCase {
             // new client will not get a result for keyword "23"
             var newClient = PIRClient<MulPirClient<Bfv<UInt32>>>(connection: client)
             result = try await newClient.request(keyword: "23")
-            XCTAssertNil(result)
+            #expect(result == nil)
 
             // Request with the old configuration is correctly routed to the previous version.
             result = try await clientWithOldConfig.request(keyword: "23")
-            XCTAssertEqual(result, "23")
+            #expect(result == "23")
 
             // update the usecase again, this time dropping the previous version.
             try await usecaseStore.set(name: "test", usecase: ExampleUsecase.ten, versionCount: 1)
 
             // request with the old configuration now throws an error
-            do {
-                _ = try await clientWithOldConfig.request(keyword: "1")
-                XCTFail("The previous line should throw!")
-            } catch {}
+            await #expect { try await clientWithOldConfig.request(keyword: "1") }
+                throws: { error in
+                    if let error = error as? PIRClientError,
+                       case let .serverError(status, _) = error
+                    {
+                        return status == .gone
+                    }
+                    return false
+                }
         }
     }
 
+    @Test
     func testAddingAndRemovingUserTokens() async throws {
         let usecaseStore = UsecaseStore()
         try await usecaseStore.set(name: "test", usecase: ExampleUsecase.hundred)
@@ -88,10 +100,15 @@ class PIRServiceTests: XCTestCase {
         let app = try await buildApplication(usecaseStore: usecaseStore, privacyPassState: privacyPassState)
         try await app.test(.live) { client in
             var pirClient = PIRClient<MulPirClient<Bfv<UInt32>>>(connection: client, userToken: "ABCD")
-            do {
-                _ = try await pirClient.request(keyword: "23")
-                XCTFail("Previous line should throw!")
-            } catch {}
+            await #expect { try await pirClient.request(keyword: "23") }
+                throws: { error in
+                    if let error = error as? PIRClientError,
+                       case let .failedToFetchTokenPublicKey(status, message) = error
+                    {
+                        return status == .unauthorized && message.contains("User token is unauthorized")
+                    }
+                    return false
+                }
 
             // after adding the user token, the request should succeed
             await userAuthenticator.add(token: "ABCD", tier: .tier1)
@@ -104,15 +121,22 @@ class PIRServiceTests: XCTestCase {
             // at least one more request should succeed because of cached tokens
             _ = try await pirClient.request(keyword: "42")
 
-            do {
+            await #expect {
                 for _ in 0..<10 {
                     _ = try await pirClient.request(keyword: "this should eventually fail when tokens run out")
                 }
-                XCTFail("Previous loop should fail")
-            } catch {}
+            } throws: { error in
+                if let error = error as? PIRClientError,
+                   case let .failedToFetchTokenPublicKey(status, message) = error
+                {
+                    return status == .unauthorized && message.contains("User token is unauthorized")
+                }
+                return false
+            }
         }
     }
 
+    @Test
     func testRepeatedShardConfigs() async throws {
         let usecaseStore = UsecaseStore()
         try await usecaseStore.set(name: "test", usecase: ExampleUsecase.repeatedShardConfig)
@@ -124,44 +148,52 @@ class PIRServiceTests: XCTestCase {
                 for index in [0, 1] {
                     let keyword = String(index)
                     let result = try await pirClient.request(keyword: keyword)
-                    XCTAssertEqual(result, keyword)
-                    let shardIndex = try XCTUnwrap(pirClient.configCache["test"]?.config
+                    #expect(result == keyword)
+                    let shardIndex = try #require(try pirClient.configCache["test"]?.config
                         .shardIndex(for: Array(keyword.utf8)))
                     queriedShards.insert(shardIndex)
                 }
-                XCTAssert(queriedShards.count > 1)
+                #expect(queriedShards.count > 1)
             }
         }
     }
 
+    @Test
     func testPirConfigExtensions() throws {
         var config = try ExampleUsecase.repeatedShardConfig.config()
-        XCTAssertEqual(config.pirConfig.shardConfigs.count, 0)
-        XCTAssertEqual(config.pirConfig.pirShardConfigs.repeatedShardConfig.shardCount, 5)
+        #expect(config.pirConfig.shardConfigs.isEmpty)
+        #expect(config.pirConfig.pirShardConfigs.repeatedShardConfig.shardCount == 5)
         let shard0Config = config.pirConfig.shardConfig(shardIndex: 0)
-        XCTAssertEqual(config.pirConfig.shardCount, 5)
+        #expect(config.pirConfig.shardCount == 5)
 
         try config.makeCompatible(with: .iOS18)
-        XCTAssertEqual(config.pirConfig.shardConfigs.count, 5)
-        XCTAssertEqual(config.pirConfig.shardConfigs, Array(repeating: shard0Config, count: 5))
+        #expect(config.pirConfig.shardConfigs.count == 5)
+        #expect(config.pirConfig.shardConfigs == Array(repeating: shard0Config, count: 5))
         for shardIndex in 0..<5 {
-            XCTAssertEqual(config.pirConfig.shardConfig(shardIndex: shardIndex), shard0Config)
+            #expect(config.pirConfig.shardConfig(shardIndex: shardIndex) == shard0Config)
         }
-        XCTAssertEqual(config.pirConfig.shardCount, 5)
+        #expect(config.pirConfig.shardCount == 5)
 
         config.pirConfig.keywordPirParams.shardingFunction.function = .doubleMod(.with { doubleMod in
             doubleMod.otherShardCount = 5
         })
 
-        XCTAssertThrowsError(try config.makeCompatible(with: .iOS18))
-        XCTAssertNoThrow(try config.makeCompatible(with: .iOS18_2))
+        #expect { try config.makeCompatible(with: .iOS18) } throws: { error in
+            guard let error = error as? HTTPError else {
+                return false
+            }
+            return error.status == .internalServerError && error.description
+                .contains("does not support sharding functions other than SHA256")
+        }
+
+        #expect(throws: Never.self) { try config.makeCompatible(with: .iOS18_2) }
     }
 }
 
 extension PIRClient {
     mutating func request(keyword: String) async throws -> String? {
         let response = try await request(keywords: [.init(keyword.utf8)], usecase: "test")
-        XCTAssertEqual(response.count, 1)
+        #expect(response.count == 1)
         return response[0].map { value in
             String(data: Data(value), encoding: .utf8) ?? "<\(value.count) bytes of binary response>"
         }

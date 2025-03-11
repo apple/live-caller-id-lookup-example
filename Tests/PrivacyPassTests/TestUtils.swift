@@ -1,4 +1,4 @@
-// Copyright 2024 Apple Inc. and the Swift Homomorphic Encryption project authors
+// Copyright 2024-2025 Apple Inc. and the Swift Homomorphic Encryption project authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import XCTest
+import Testing
 
 public extension [UInt8] {
     init?(hexEncoded hexString: String) {
@@ -43,12 +43,14 @@ public extension [UInt8] {
     }
 }
 
-class TestUtilTests: XCTestCase {
+@Suite
+struct TestUtilTests {
+    @Test
     func testHexString() {
-        XCTAssertEqual(Array(base64Encoded: "AAAA"), Array(hexEncoded: "000000"))
-        XCTAssertEqual(Array(base64Encoded: "AAAB"), Array(hexEncoded: "000001"))
+        #expect(Array(base64Encoded: "AAAA") == Array(hexEncoded: "000000"))
+        #expect(Array(base64Encoded: "AAAB") == Array(hexEncoded: "000001"))
         let data = (0..<71).map { _ in UInt8.random(in: UInt8.min...UInt8.max) }
         let hexString = data.hexEncodedString()
-        XCTAssertEqual(Array(hexEncoded: hexString), data)
+        #expect(Array(hexEncoded: hexString) == data)
     }
 }

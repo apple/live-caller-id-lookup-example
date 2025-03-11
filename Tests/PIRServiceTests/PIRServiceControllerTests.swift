@@ -1,4 +1,4 @@
-// Copyright 2024 Apple Inc. and the Swift Homomorphic Encryption project authors
+// Copyright 2024-2025 Apple Inc. and the Swift Homomorphic Encryption project authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import Foundation
 import HomomorphicEncryption
 import HomomorphicEncryptionProtobuf
 import Hummingbird
@@ -19,10 +20,12 @@ import HummingbirdTesting
 @testable import PIRService
 import PrivateInformationRetrieval
 import PrivateInformationRetrievalProtobuf
+import Testing
 import Util
-import XCTest
 
-class PIRServiceControllerTests: XCTestCase {
+@Suite
+struct PIRServiceControllerTests {
+    @Test
     func testNoUserIdentifier() async throws {
         // Error message returned by Hummingbird
         struct ErrorMessage: Codable {
@@ -38,11 +41,12 @@ class PIRServiceControllerTests: XCTestCase {
         try await app.test(.live) { client in
             try await client.execute(uri: "/key", method: .post) { response in
                 let errorMessage = try JSONDecoder().decode(ErrorMessage.self, from: response.body)
-                XCTAssertEqual(errorMessage.error.message, "Missing 'User-Identifier' header")
+                #expect(errorMessage.error.message == "Missing 'User-Identifier' header")
             }
         }
     }
 
+    @Test
     func testKeyUpload() async throws {
         let evaluationKeyStore = MemoryPersistDriver()
         let app = try await buildApplication(evaluationKeyStore: evaluationKeyStore)
@@ -60,20 +64,20 @@ class PIRServiceControllerTests: XCTestCase {
             evalKeys.keys = [evalKey]
         }
         try await app.test(.live) { client in
-            try await client
-                .execute(uri: "/key", userIdentifier: user, message: evaluationKeys) { response in
-                    XCTAssertEqual(response.status, .ok)
-                }
+            try await client.execute(uri: "/key", userIdentifier: user, message: evaluationKeys) { response in
+                #expect(response.status == .ok)
+            }
 
             // make sure the evaluation key was persisted
             let persistKey = PIRServiceController.persistKey(user: user, configHash: evalKeyMetadata.identifier)
             let storedKey = try await evaluationKeyStore.get(
                 key: persistKey,
                 as: Protobuf<Apple_SwiftHomomorphicEncryption_Api_Shared_V1_EvaluationKey>.self)
-            XCTAssertEqual(storedKey?.message, evalKey)
+            #expect(storedKey?.message == evalKey)
         }
     }
 
+    @Test
     func testConfigFetch() async throws {
         let usecaseStore = UsecaseStore()
         let exampleUsecase = ExampleUsecase.hundred
@@ -86,15 +90,16 @@ class PIRServiceControllerTests: XCTestCase {
         }
         try await app.test(.live) { client in
             try await client.execute(uri: "/config", userIdentifier: user, message: configRequest) { response in
-                XCTAssertEqual(response.status, .ok)
+                #expect(response.status == .ok)
                 let configResponse = try response
                     .message(as: Apple_SwiftHomomorphicEncryption_Api_Pir_V1_ConfigResponse.self)
-                try XCTAssertEqual(configResponse.configs["test"], exampleUsecase.config())
-                try XCTAssertEqual(configResponse.keyInfo[0].keyConfig, exampleUsecase.evaluationKeyConfig())
+                #expect(try configResponse.configs["test"] == exampleUsecase.config())
+                #expect(try configResponse.keyInfo[0].keyConfig == exampleUsecase.evaluationKeyConfig())
             }
         }
     }
 
+    @Test
     func testCachedConfigFetch() async throws {
         let usecaseStore = UsecaseStore()
         let exampleUsecase = ExampleUsecase.repeatedShardConfig
@@ -116,13 +121,13 @@ class PIRServiceControllerTests: XCTestCase {
                         message: configRequest,
                         platform: platform)
                     { response in
-                        XCTAssertEqual(response.status, .ok)
+                        #expect(response.status == .ok)
                         var expectedConfig = try exampleUsecase.config()
                         try expectedConfig.makeCompatible(with: platform)
                         let configResponse = try response
                             .message(as: Apple_SwiftHomomorphicEncryption_Api_Pir_V1_ConfigResponse.self)
-                        XCTAssertEqual(configResponse.configs["test"], expectedConfig)
-                        try XCTAssertEqual(configResponse.keyInfo[0].keyConfig, exampleUsecase.evaluationKeyConfig())
+                        #expect(configResponse.configs["test"] == expectedConfig)
+                        #expect(try configResponse.keyInfo[0].keyConfig == exampleUsecase.evaluationKeyConfig())
                     }
                 }
                 // Existing configId
@@ -137,19 +142,19 @@ class PIRServiceControllerTests: XCTestCase {
                     message: configRequestWithConfigId,
                     platform: platform)
                 { response in
-                    XCTAssertEqual(response.status, .ok)
+                    #expect(response.status == .ok)
                     let configResponse = try response
                         .message(as: Apple_SwiftHomomorphicEncryption_Api_Pir_V1_ConfigResponse.self)
-                    XCTAssertEqual(configResponse.configs["test"]?.reuseExistingConfig, true)
-                    XCTAssertEqual(
-                        configResponse.configs["test"]?.pirConfig,
+                    #expect(configResponse.configs["test"]?.reuseExistingConfig == true)
+                    #expect(configResponse.configs["test"]?.pirConfig ==
                         Apple_SwiftHomomorphicEncryption_Api_Pir_V1_PIRConfig())
-                    try XCTAssertEqual(configResponse.keyInfo[0].keyConfig, exampleUsecase.evaluationKeyConfig())
+                    #expect(try configResponse.keyInfo[0].keyConfig == exampleUsecase.evaluationKeyConfig())
                 }
             }
         }
     }
 
+    @Test
     func testCompressedConfigFetch() async throws {
         // Mock usecase that has a large config with 10K randomized shardConfigs.
         struct TestUseCaseWithLargeConfig: Usecase {
@@ -209,16 +214,15 @@ class PIRServiceControllerTests: XCTestCase {
                 message: configRequest,
                 acceptCompression: true)
             { response in
-                XCTAssertEqual(response.status, .ok)
-                XCTAssertEqual(response.headers[.contentEncoding], "gzip")
-                XCTAssertEqual(response.headers[.transferEncoding], "chunked")
+                #expect(response.status == .ok)
+                #expect(response.headers[.contentEncoding] == "gzip")
+                #expect(response.headers[.transferEncoding] == "chunked")
                 var compressedBody = response.body
-                XCTAssertLessThan(compressedBody.readableBytes, uncompressedConfigSize)
+                #expect(compressedBody.readableBytes < uncompressedConfigSize)
                 let uncompressed = try compressedBody.decompress(with: .gzip())
-                let configResponse =
-                    try Apple_SwiftHomomorphicEncryption_Api_Pir_V1_ConfigResponse(
-                        serializedBytes: Array(buffer: uncompressed))
-                try XCTAssertEqual(configResponse.configs["test"], exampleUsecase.config())
+                let configResponse = try Apple_SwiftHomomorphicEncryption_Api_Pir_V1_ConfigResponse(
+                    serializedBytes: Array(buffer: uncompressed))
+                #expect(try configResponse.configs["test"] == exampleUsecase.config())
             }
         }
     }
