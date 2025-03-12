@@ -1,4 +1,4 @@
-// Copyright 2024 Apple Inc. and the Swift Homomorphic Encryption project authors
+// Copyright 2024-2025 Apple Inc. and the Swift Homomorphic Encryption project authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,9 +15,10 @@ import _CryptoExtras
 import Crypto
 import Foundation
 @testable import PrivacyPass
-import XCTest
+import Testing
 
-class PrivacyPassTests: XCTestCase {
+@Suite
+struct PrivacyPassTests {
     private enum InvalidHexString: Error {
         case invalidHexString
     }
@@ -29,12 +30,14 @@ class PrivacyPassTests: XCTestCase {
         return array
     }
 
+    @Test
     func testConvertAndLoadPublicKey() throws {
         let privateKey = try PrivacyPass.PrivateKey()
         let spki = try privateKey.publicKey.spki()
         _ = try PrivacyPass.PublicKey(fromSPKI: spki)
     }
 
+    @Test
     func testIssuance() async throws {
         let privateKey = try PrivacyPass.PrivateKey()
         let publicKey = privateKey.publicKey
@@ -43,10 +46,10 @@ class PrivacyPassTests: XCTestCase {
         let response = try issuer.issue(request: preparedRequest.tokenRequest)
         let token = try preparedRequest.finalize(response: response)
         let verifier = PrivacyPass.Verifier(publicKey: publicKey, nonceStore: InMemoryNonceStore())
-        let valid = try await verifier.verify(token: token)
-        XCTAssert(valid)
+        #expect(try await verifier.verify(token: token))
     }
 
+    @Test
     func testNoDoubleSpend() async throws {
         let privateKey = try PrivacyPass.PrivateKey()
         let publicKey = privateKey.publicKey
@@ -55,12 +58,11 @@ class PrivacyPassTests: XCTestCase {
         let response = try issuer.issue(request: preparedRequest.tokenRequest)
         let token = try preparedRequest.finalize(response: response)
         let verifier = PrivacyPass.Verifier(publicKey: publicKey, nonceStore: InMemoryNonceStore())
-        let valid = try await verifier.verify(token: token)
-        XCTAssert(valid)
-        let notValid = try await verifier.verify(token: token)
-        XCTAssertFalse(notValid)
+        #expect(try await verifier.verify(token: token))
+        #expect(try await !verifier.verify(token: token))
     }
 
+    @Test
     func testVectors() async throws {
         struct TestVector: Codable {
             let skS: String
@@ -86,12 +88,12 @@ class PrivacyPassTests: XCTestCase {
         for testVector in testVectors {
             // load private key
             let skS = try unhex(testVector.skS)
-            let privateKeyPEM = try XCTUnwrap(String(data: Data(skS), encoding: .ascii))
+            let privateKeyPEM = try #require(String(data: Data(skS), encoding: .ascii))
             let privateKey = try PrivacyPass.PrivateKey(pemRepresentation: privateKeyPEM)
             // verify public key is correctly encoded
             let pkS = try unhex(testVector.pkS)
             let spki = try privateKey.publicKey.spki()
-            XCTAssertEqual(spki, pkS)
+            #expect(spki == pkS)
             // verify we can load the public key directly from SPKI
             let publicKey = try PrivacyPass.PublicKey(fromSPKI: pkS)
             // construct token request
@@ -101,35 +103,36 @@ class PrivacyPassTests: XCTestCase {
             // load token request
             let tokenRequestBytes = try unhex(testVector.token_request)
             let tokenRequest = try PrivacyPass.TokenRequest(from: tokenRequestBytes)
-            XCTAssertEqual(tokenRequest.bytes(), tokenRequestBytes)
+            #expect(tokenRequest.bytes() == tokenRequestBytes)
             // verify token response
             let tokenResponseBytes = try unhex(testVector.token_response)
             let tokenResponse = try PrivacyPass.TokenResponse(from: tokenResponseBytes)
             let issuer = try PrivacyPass.Issuer(privateKey: privateKey)
             let issuedResponse = try issuer.issue(request: tokenRequest)
-            XCTAssertEqual(issuedResponse, tokenResponse)
-            XCTAssertEqual(issuedResponse.bytes(), tokenResponseBytes)
+            #expect(issuedResponse == tokenResponse)
+            #expect(issuedResponse.bytes() == tokenResponseBytes)
             // load token
             let tokenBytes = try unhex(testVector.token)
             let token = try PrivacyPass.Token(from: tokenBytes)
-            XCTAssertEqual(token.bytes(), tokenBytes)
+            #expect(token.bytes() == tokenBytes)
             // verify token validity
             let verifier = PrivacyPass.Verifier(publicKey: privateKey.publicKey, nonceStore: InMemoryNonceStore())
-            let verified = try await verifier.verify(token: token)
-            XCTAssertTrue(verified)
+            #expect(try await verifier.verify(token: token))
         }
     }
 
+    @Test
     func testTokenChallenge() throws {
         // token challenge with issuer = "test"
         let referenceBytes: [UInt8] = [0, 2, 0, 4, 116, 101, 115, 116, 0, 0, 0]
         let tokenChallenge = try TokenChallenge(tokenType: TokenTypeBlindRSA, issuer: "test")
         let challengeBytes = try tokenChallenge.bytes()
-        XCTAssertEqual(challengeBytes, referenceBytes)
+        #expect(challengeBytes == referenceBytes)
         let decodedChallenge = try TokenChallenge(from: challengeBytes)
-        XCTAssertEqual(decodedChallenge, tokenChallenge)
+        #expect(decodedChallenge == tokenChallenge)
     }
 
+    @Test
     func testChallengeVectors() throws {
         struct TestVector: Codable {
             // Note: we use implicitly unwrapped optionals, becuase test vector 6 from
@@ -160,7 +163,7 @@ class PrivacyPassTests: XCTestCase {
         let testVectors = try TestVector.load(from: URL(
             fileURLWithPath: "TestVectors/PrivacyPassChallengeAndRedemptionStructure.json",
             relativeTo: URL(fileURLWithPath: #filePath)))
-        XCTAssertEqual(testVectors.count, 6)
+        #expect(testVectors.count == 6)
         for testVector in testVectors {
             let tokenType = try UInt16(bigEndianBytes: unhex(testVector.token_type))
             guard tokenType == TokenTypeBlindRSA else {
@@ -186,11 +189,11 @@ class PrivacyPassTests: XCTestCase {
             tokenInput.append(contentsOf: challengeDigest)
             tokenInput.append(contentsOf: tokenKeyId)
 
-            XCTAssertEqual(tokenInput, tokenAuthenticatorInput)
+            #expect(tokenInput == tokenAuthenticatorInput)
 
             // test parsing challenge bytes
             let parsed = try TokenChallenge(from: challengeBytes)
-            XCTAssertEqual(parsed, tokenChallenge)
+            #expect(parsed == tokenChallenge)
 
             // construct challenge bytes from fields
             let issuerName = try unhex(testVector.issuer_name)
@@ -206,7 +209,7 @@ class PrivacyPassTests: XCTestCase {
             constructedChallengeBytes.append(contentsOf: originInfo)
 
             let constructedChallenge = try TokenChallenge(from: constructedChallengeBytes)
-            XCTAssertEqual(constructedChallenge, tokenChallenge)
+            #expect(constructedChallenge == tokenChallenge)
         }
     }
 }

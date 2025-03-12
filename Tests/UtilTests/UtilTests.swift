@@ -1,4 +1,4 @@
-// Copyright 2024 Apple Inc. and the Swift Homomorphic Encryption project authors
+// Copyright 2024-2025 Apple Inc. and the Swift Homomorphic Encryption project authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,38 +12,41 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import Testing
 import Util
-import XCTest
 
-class UtilTests: XCTestCase {
+@Suite
+struct UtilTests {
+    @Test
     func testOsVersion() throws {
         let os18 = OsVersion(major: 18)
         let os18_0_1 = OsVersion(major: 18, patch: 1)
         let os18_1 = OsVersion(major: 18, minor: 1)
         let os19 = OsVersion(major: 19, minor: 0)
 
-        XCTAssertLessThan(os18, os18_0_1)
-        XCTAssertLessThan(os18_0_1, os18_1)
-        XCTAssertLessThan(os18, os18_1)
-        XCTAssertLessThan(os18, os19)
+        #expect(os18 < os18_0_1)
+        #expect(os18_0_1 < os18_1)
+        #expect(os18 < os18_1)
+        #expect(os18 < os19)
 
-        XCTAssertEqual(OsVersion(from: "18"), os18)
-        XCTAssertEqual(OsVersion(from: "18.0"), os18)
-        XCTAssertEqual(OsVersion(from: "18.0.0"), os18)
+        #expect(OsVersion(from: "18") == os18)
+        #expect(OsVersion(from: "18.0") == os18)
+        #expect(OsVersion(from: "18.0.0") == os18)
 
-        XCTAssertEqual(OsVersion(from: "18.1"), os18_1)
-        XCTAssertEqual(OsVersion(from: "18.1.0"), os18_1)
+        #expect(OsVersion(from: "18.1") == os18_1)
+        #expect(OsVersion(from: "18.1.0") == os18_1)
 
-        XCTAssertNil(OsVersion(from: "abc"))
-        XCTAssertNil(OsVersion(from: "-1"))
-        XCTAssertNil(OsVersion(from: "1.2.3.4"))
-        XCTAssertNil(OsVersion(from: "1.2.3xyz"))
+        #expect(OsVersion(from: "abc") == nil)
+        #expect(OsVersion(from: "-1") == nil)
+        #expect(OsVersion(from: "1.2.3.4") == nil)
+        #expect(OsVersion(from: "1.2.3xyz") == nil)
     }
 
+    @Test
     func testExampleUserAgent() throws {
         func runTest(platform: Platform) {
             let parsed = Platform(userAgent: platform.exampleUserAgent)
-            XCTAssertEqual(parsed, platform)
+            #expect(parsed == platform)
         }
 
         runTest(platform: .macOS15)
