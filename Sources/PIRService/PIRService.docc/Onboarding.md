@@ -1,4 +1,4 @@
-# How to onboard Live Caller ID Lookup extension with Apple Private relay
+# How to onboard Live Caller ID Lookup extension with Apple's Oblivious HTTP relay
 
 Understand the requirements for running a Live Caller ID Lookup service.
 
@@ -14,13 +14,50 @@ your chosen oblivious HTTP gateway.
 ## How to test without private relay
 
 The system does not use private relay, when the application is installed directly from Xcode. This allows the
-application & the service deployment to be tested before filling out the onboarding form and setting up private relay.
+application & the service deployment to be tested before filling out the onboarding form and setting up Oblivious HTTP
+relay.
 
 
 ## Requirements
 
-Before you can fill out the form, there are a few requirements you have to satisfy to ensure smooth operations.
+Before filling out the form, there are a few requirements you have to satisfy to ensure smooth operations.
 
+### OHTTP gateway
+
+Apple's OHTTP relay expects your chosen OHTTP gateway to support HTTP/2. You can verify it by running.
+```
+openssl s_client -alpn h2 -connect $(OHTTP_GATEWAY_FQDN):443 </dev/null
+```
+In the output check if the SSL session was established or not.
+
+### URLs
+Please provide the URLs as you would put them into the
+[LiveCallerIDLookupExtensionContext](https://developer.apple.com/documentation/identitylookup/livecalleridlookupextensioncontext).
+
+> Important: In addition, we strongly advice you to use subdomains instead of paths. Support for custom paths for the
+> service URL and token issuer URL will be deprecated in a future iOS version.
+
+Good example:
+```
+https://gateway.example.net
+https://issuer.example.net
+https://service.example.net
+```
+
+Bad example:
+```
+http://example.net:8080/lookup - No HTTPS, non standard port, path instead of subdomain
+```
+
+### HTTP Bearer Token / UserToken
+The `userToken` field is a of type `Data` and the system sets the "Authorization" header like this:
+```swift
+request.setValue("Bearer \(userToken.base64EncodedString())", forHTTPHeaderField: "Authorization")
+```
+This implies that when filling out the form, you must enter a valid base64 encoding.
+> Warning: For example JSON Web Tokens are not valid base64 encodings and are therefore unsupported.
+
+### Checklist
 
 1. You must know the bundle identifier of your Live Caller ID Lookup extension.
 2. You need to provide expected request and response size and per continent traffic estimates that include:
