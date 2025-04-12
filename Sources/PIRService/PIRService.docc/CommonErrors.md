@@ -8,13 +8,13 @@ While using the example service or when developing your own service, you will mo
 that will be listed below. This page gives more details about the errors, like why they happen, what they mean, and how
 to work around them.
 
-## How to look for errors
+### How to look for errors
 
 You can use the Console app to see on-device logs. Search for error messages from the `com.apple.cipherml` subsystem.
 
-## Common problems
+### Common problems
 
-### The request timed out
+#### The request timed out
 
 **Error example**:
 
@@ -33,7 +33,7 @@ This problem has multiple potential causes with multiple workarounds.
 2. Double-check that the device is on the same network as your MacBook.
 3. Change from using mDNS to a IP address directly.
 
-### Failed to fetch token
+#### Failed to fetch token
 **Error example**:
 
 ```
@@ -53,7 +53,7 @@ The `issuerRequestUri` field in `service-config.json` should also contain `/issu
 `http://MacBook-Pro.local:8080/issue`. Also make sure that the user token in the extension matches one in the
 `service-config.json`.
 
-### Missing configuration
+#### Missing configuration
 
 **Error example**:
 
@@ -75,7 +75,7 @@ Double-check that the service has usecases configured the way the device expects
 
 where `<bundleIdentifier>` is replaced with bundle identifier of your Live Caller ID Lookup extension.
 
-### No token key found with key id
+#### No token key found with key id
 
 **Error example**:
 
@@ -105,7 +105,7 @@ therefore making the cached tokens invalid.
 Once the device runs out of cached tokens, it will fetch new ones. One way to speed up the process is to call
 [refreshPIRParameters(forExtensionWithIdentifier:)](https://developer.apple.com/documentation/sms_and_call_reporting/livecalleridlookupmanager/4418043-refreshpirparameters).
 
-### Evaluation key not found
+#### Evaluation key not found
 
 **Error example**:
 
