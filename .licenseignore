@@ -1,0 +1,8 @@
+**/.swiftformat
+*.pb.swift
+*.png
+.gitignore
+.swiftformat
+Package.resolved
+Package.swift
+Snippets/*

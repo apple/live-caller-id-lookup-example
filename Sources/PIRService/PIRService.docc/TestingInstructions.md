@@ -13,7 +13,7 @@ the feature. The general outline of the steps involved is as follows:
 * Running the service.
 * Writing the application extension.
 
-## Getting the tools on your path
+### Getting the tools on your path
 
 These testing steps assume that you have the following binaries available on your `$PATH`.
 The binaries are:
@@ -29,14 +29,14 @@ export PATH="$HOME/.swiftpm/bin:$PATH"
 Make sure to reload it (`source ~/.zshrc`) or by restarting your terminal emulator. Then we are going to use the
 `experimental-install` feature of Swift Package Manager.
 
-### ConstructDatabase
+#### ConstructDatabase
 
 Change directory to a checkout of this repository and run the following command.
 ```sh
 swift package experimental-install -c release --product ConstructDatabase
 ```
 
-### PIRProcessDatabase
+#### PIRProcessDatabase
 
 This tool comes from the [main repository](https://github.com/apple/swift-homomorphic-encryption) of Swift Homomorphic
 Encryption. Change directory to a checkout of the main repository and run the following command.
@@ -45,14 +45,14 @@ Encryption. Change directory to a checkout of the main repository and run the fo
 swift package experimental-install -c release --product PIRProcessDatabase
 ```
 
-### PIRService
+#### PIRService
 
 Change directory to a checkout of this repository and run the following command.
 ```sh
 swift package experimental-install -c release --product PIRService
 ```
 
-## Preparing the dataset
+### Preparing the dataset
 
 > Seealso: <doc:DataFormat>
 
@@ -98,7 +98,7 @@ This file is a [text format representation](https://protobuf.dev/reference/proto
 The schema for the message can be found at `Sources/ConstructDatabase/protobuf/InputIdentities.proto`. As you can see,
 we have set up 3 identities.
 
-### Adding icons
+#### Adding icons
 While `input.txtpb` contains almost all the fields that are needed, it is missing icons. Icons are somewhat hard to
 represent in a textual format so `ConstructDatabase` provides a way to overcome that limitation. To add icons for the
 identities create a new folder:
@@ -124,7 +124,7 @@ $ ls icons
 It is not necessary to provide icons for all identities. When `ConstuctDatabase` is parsing the input identities file,
 it will search for the icon in the icons directory and attaches it if it is found.
 
-## Constructing the two databases
+### Constructing the two databases
 Once we have prepared our input in the `input.txtpb` file and the `icons` folder. It is time to call:
 ```sh
 ConstructDatabase --icon-directory icons input.txtpb block.binpb identity.binpb
@@ -135,7 +135,7 @@ expected for Live Caller ID Lookup. Both of these are in binary protobuf format,
 [PIRProcessDatabase](https://swiftpackageindex.com/apple/swift-homomorphic-encryption/main/documentation/pirprocessdatabase)
 utility.
 
-## Processing the datasets
+### Processing the datasets
 
 Before setting up a server to host these two datasets we need to process them a bit, so the online PIR queries can be
 done faster. For this we will use the
@@ -198,7 +198,7 @@ This will create the following files:
 > Important: The blocking dataset is has very small entries and the identity dataset has larger entries. So it makes
 > sense to use different parameters for them.
 
-## Running the service
+### Running the service
 
 Copy the following to a file called `service-config.json`.
 
@@ -256,7 +256,7 @@ By default `PIRService` will start listening on the loopback interface, but you 
 make it listen on all network interfaces. The default port is `8080`, but it can be changed by using the `--port`
 option.
 
-### Features
+#### Features
 After introduction in iOS 18.0, `Live Caller ID Lookup` introduced further features.
 
 * `Fixed PIR Shard Config` (iOS 18.2). When all shard configurations are identical, `PIR Fixed Shard Config` allows for a more compact PIR config, saving bandwidth and client-side memory usage. To enable, set the `pirShardConfigs` field in the PIR config. iOS clients prior to iOS 18.2 will still require the `shardConfigs` field to be set. See [Reusing PIR Parameters]( https://swiftpackageindex.com/apple/swift-homomorphic-encryption/main/documentation/privateinformationretrieval/reusingpirparameters) for how to process the database such that all shard configurations are identical.
@@ -269,7 +269,7 @@ After introduction in iOS 18.0, `Live Caller ID Lookup` introduced further featu
   requests are made with the same keyword, like in Live Caller ID Lookup, where we use the same phone number to look up
   blocking information and Identity information. Note: this option is not backward compatible with older iOS versions.
 
-## Writing the application extension
+### Writing the application extension
 
 > Important: Please see [Getting up-to-date calling and blocking information for your
 > app](https://developer.apple.com/documentation/sms_and_call_reporting/getting_up-to-date_calling_and_blocking_information_for_your_app)
@@ -297,7 +297,7 @@ var context: LiveCallerIDLookupExtensionContext { get {
 }}
 ```
 
-### Running locally
+#### Running locally
 
 When running things locally on your Mac, and your testing device is on the same network, then you can use mDNS to let
 the device find your Mac. Let's assume that your Mac's hostname is `Tims-MacBook-Pro.local`.

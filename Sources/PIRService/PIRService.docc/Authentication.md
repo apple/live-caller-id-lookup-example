@@ -54,7 +54,7 @@ the issuer name. Redemption context and origin info fields will be left unset.
 
 The token request includes the User Token in the `Authorization` HTTP header.
 
-## See also
+### See also
 
 - [The Privacy Pass Architecture](https://www.rfc-editor.org/rfc/rfc9576)
 - [Privacy Pass Issuance Protocols](https://www.rfc-editor.org/rfc/rfc9578)

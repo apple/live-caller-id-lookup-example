@@ -11,18 +11,18 @@ your chosen oblivious HTTP gateway.
 
 ![Oblivious HTTP flow diagram](oblivious-http.png)
 
-## How to test without private relay
+### How to test without private relay
 
 The system does not use private relay, when the application is installed directly from Xcode. This allows the
 application & the service deployment to be tested before filling out the onboarding form and setting up Oblivious HTTP
 relay.
 
 
-## Requirements
+### Requirements
 
 Before filling out the form, there are a few requirements you have to satisfy to ensure smooth operations.
 
-### OHTTP gateway
+#### OHTTP gateway
 
 Apple's OHTTP relay expects your chosen OHTTP gateway to support HTTP/2. You can verify it by running.
 ```
@@ -30,7 +30,7 @@ openssl s_client -alpn h2 -connect $(OHTTP_GATEWAY_FQDN):443 </dev/null
 ```
 In the output check if the SSL session was established or not.
 
-### URLs
+#### URLs
 Please provide the URLs as you would put them into the
 [LiveCallerIDLookupExtensionContext](https://developer.apple.com/documentation/identitylookup/livecalleridlookupextensioncontext).
 
@@ -49,7 +49,7 @@ Bad example:
 http://example.net:8080/lookup - No HTTPS, non standard port, path instead of subdomain
 ```
 
-### HTTP Bearer Token / UserToken
+#### HTTP Bearer Token / UserToken
 The `userToken` field is a of type `Data` and the system sets the "Authorization" header like this:
 ```swift
 request.setValue("Bearer \(userToken.base64EncodedString())", forHTTPHeaderField: "Authorization")
@@ -57,7 +57,7 @@ request.setValue("Bearer \(userToken.base64EncodedString())", forHTTPHeaderField
 This implies that when filling out the form, you must enter a valid base64 encoding.
 > Warning: For example JSON Web Tokens are not valid base64 encodings and are therefore unsupported.
 
-### Checklist
+#### Checklist
 
 1. You must know the bundle identifier of your Live Caller ID Lookup extension.
 2. You need to provide expected request and response size and per continent traffic estimates that include:
@@ -79,7 +79,7 @@ This implies that when filling out the form, you must enter a valid base64 encod
 11. You must ensure that your deployment (including Oblivious HTTP gateway & PIR service) is running so that we can
     perform the validation test.
 
-## Onboarding form
+### Onboarding form
 
 The onboarding form should be filled out when you have a working service, but before you start distributing your
 application with the Live Caller ID Lookup extension.
