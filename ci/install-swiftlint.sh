@@ -21,7 +21,8 @@ mkdir -p /tmp/swiftlint
 cd /tmp/swiftlint || exit 1
 git clone --depth 1 --branch "$SWIFTLINT_VERSION" https://github.com/realm/SwiftLint
 cd SwiftLint || exit
-swift build -c release
-export PATH=$PATH:$PWD/.build/release/
+swift build -c debug
+# Building in release mode is slow
+export PATH=$PATH:$PWD/.build/debug/
 cd "$DIR" || exit 1
 which swiftlint

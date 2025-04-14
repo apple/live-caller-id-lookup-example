@@ -30,6 +30,7 @@ jobs:
       # https://github.com/apple/swift-distributed-tracing/issues/165
       enable_windows_checks: false
       linux_exclude_swift_versions: "[{\"swift_version\": \"5.9\"}, {\"swift_version\": \"5.10\"}]"
+      linux_build_command: "swift test --configuration release"
   pre-commit:
     timeout-minutes: 1
     runs-on: ubuntu-latest
@@ -68,14 +69,14 @@ jobs:
         id: cache-swiftlint
         uses: actions/cache@v4
         with:
-          path: /tmp/swiftlint/SwiftLint/.build/release/swiftlint
+          path: /tmp/swiftlint/SwiftLint/.build/debug/swiftlint
           key: ${{ runner.os }}-swiftlint-${{ env.SWIFTLINT_VERSION }}
       - name: Install SwiftLint
         if: steps.cache-swiftlint.outputs.cache-hit != 'true'
         run: |
           ci/install-swiftlint.sh
       - name: Run SwiftLint
-        run: /tmp/swiftlint/SwiftLint/.build/release/swiftlint lint --strict .
+        run: /tmp/swiftlint/SwiftLint/.build/debug/swiftlint lint --strict .
   lockwood-swiftformat:
     timeout-minutes: 5
     runs-on: ubuntu-latest
