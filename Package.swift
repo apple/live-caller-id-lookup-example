@@ -1,7 +1,7 @@
 // swift-tools-version: 6.0
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
-// Copyright 2024 Apple Inc. and the Swift Homomorphic Encryption project authors
+// Copyright 2024-2025 Apple Inc. and the Swift Homomorphic Encryption project authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,9 +34,7 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.2.0"),
         .package(url: "https://github.com/apple/swift-asn1.git", from: "1.0.0"),
         .package(url: "https://github.com/apple/swift-crypto.git", from: "3.5.0"),
-        .package(
-            url: "https://github.com/apple/swift-homomorphic-encryption",
-            revision: "b73daaca802e16c9f6a31da76f26375c34896c15"),
+        .package(url: "https://github.com/apple/swift-homomorphic-encryption", branch: "release/1.1"),
         .package(url: "https://github.com/apple/swift-protobuf.git", from: "1.27.0"),
         .package(url: "https://github.com/hummingbird-project/hummingbird", from: "2.0.0"),
         .package(url: "https://github.com/hummingbird-project/hummingbird-compression", from: "2.0.0-rc.2"),
