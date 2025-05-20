@@ -23,7 +23,7 @@ let swiftSettings: [SwiftSetting] = [
 ]
 
 let package = Package(
-    name: "live-caller-id-lookup-example",
+    name: "pir-service-example",
     products: [
         .executable(name: "PIRService", targets: ["PIRService"]),
         .executable(name: "ConstructDatabase", targets: ["ConstructDatabase"]),
