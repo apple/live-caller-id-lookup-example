@@ -54,7 +54,7 @@ swift package experimental-install -c release --product PIRService
 
 ### Preparing the dataset
 
-> Seealso: <doc:DataFormat>
+> Seealso: <doc:LiveCallerIdLookupDataFormat>
 
 Lets start by making a new directory:
 ```sh
